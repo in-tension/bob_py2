@@ -55,7 +55,7 @@ class Hseg :
 
 
 
-    ## <properties>
+## <properties>
     def file_dict(self) :
         """
             `property`
@@ -81,6 +81,7 @@ class Hseg :
             self.make_file_dicts()
             return self._cell_file_dict
 
+
     def raw_stack(self) :
         try :
             return self._raw_stack
@@ -94,10 +95,6 @@ class Hseg :
         except :
             self.open_raw_stack()
             return self._cal
-
-
-
-
 
     def nuc_bin(self) :
         try :
@@ -120,7 +117,7 @@ class Hseg :
 
     ## </properties>
 
-    ## <create properties>
+## <create properties>
 
 
     def make_file_dicts(self) :
@@ -156,14 +153,13 @@ class Hseg :
         self._cal = self._raw_stack.getCalibration()
 
     def create_cells(self) :
-        # print("hseg.make_cells")
+        """create cells from cell rois"""
         self._cells = []
         self._cell_dict = {}
-        for cell_name, cell_path in self._cell_file_dict.items() :
+        for cell_name, cell_path in self.cell_file_dict().items() :
             self._cells.append(Cell(self, cell_name, cell_path))
             self._cell_dict[cell_name] = len(self._cells) - 1
-        # print(self._cells)
-        # return self._cells
+
 
 
     def create_nucs(self) :
@@ -204,29 +200,45 @@ class Hseg :
 
 
     def open_hseg_imp(self, suf) :
+        """open imp which starts with <hseg.get_id()>_<suf>"""
         if suf not in self.file_dict() :
             imp = None
             IJ.log('hemisegment {} does not have raw tif file {}'.format(self.name, self.name + suf))
             ## raise Exception('hemisegment {} does not have raw tif file {}'.format(self.name, self.name + suf))
 
         else :
-            # print(self.file_dict[suf])
             imp = IJ.openImage(self.file_dict()[suf])
-
-        # print(imp)
 
         return imp
 
 
 
+## <to_string functions>
+
     def get_prefix(self) :
+        """For logging: prints name tabbed out appropriately"""
         return '  ' + self.name + ':'
 
     def get_id(self) :
+        """
+        id = <exper.name>[_<hseg.name>[_<cell.name>[_<nuc.name>]]]
+        created by recursively calling parent.get_id()
+        """
         return '_'.join([self.exper.get_id(), self.name])
+
+    def get_short_id(self) :
+        """
+        short_id = <hseg.name>[_<cell.name>[_<nuc.name>]]
+        created by recursively calling parent.get_short_id()
+        ends the recursive calls by return self.name
+        """
+        return self.name
+
 
     def __str__(self) :
         return self.get_id()
 
     def __repr__(self) :
         return self.get_id()
+
+    ## </to_string functions>

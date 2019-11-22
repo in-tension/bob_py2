@@ -80,7 +80,7 @@ class Exper :
 
 
 
-    ## <properties>
+## <properties>
 
     def hsegs(self) :
         try :
@@ -90,7 +90,6 @@ class Exper :
             self.create_hsegs()
             return self._hsegs
 
-
     def hseg_dict(self) :
         try :
             return self._hseg_dict
@@ -98,8 +97,6 @@ class Exper :
 
             self.create_hsegs()
             return self._hseg_dict
-
-
 
 
     def channels(self) :
@@ -161,10 +158,11 @@ class Exper :
 
     ## </properties>
 
-    ## <create properties>
+## <create properties>
+
     def load_json_info(self) :
+        """read json file with metadata and intialize relevant properties"""
         json_file_path = os.path.join(self.path, self.name + Exper.JSON_SUF)
-        # print(json_file_path)
 
         if not os.path.exists(json_file_path) :
             IJ.log('no experiment json file for experiment {}\npath:{}'.format(self.name, json_file_path))
@@ -175,21 +173,17 @@ class Exper :
 
             ignore, json_text = raw_text.split(Exper.JSON_SPLIT_CHAR)
             json_raw = json.loads(json_text)
-            sefl._hseg_slices = json_raw[Exper.JSON_KEY_SLICES]
-            sefl._calc_dict = json_raw[Exper.JSON_KEY_CALC]
+            self._hseg_slices = json_raw[Exper.JSON_KEY_SLICES]
+            self._calc_dict = json_raw[Exper.JSON_KEY_CALC]
 
             channels_raw = json_raw[Exper.JSON_KEY_CHANNELS]
-            sefl._channels = {int(key): value for key, value in channels_raw.items()}
+            self._channels = {int(key): value for key, value in channels_raw.items()}
 
-
-            # print(channels)
-            sefl._prj_method_dict = {}
+            self._prj_method_dict = {}
 
             for channel, info_list in channels.items() :
                 if info_list[1] == None :
                     continue
-                # print(channel)
-                # print(info_list)
 
                 channel_name = info_list[0]
                 print("info_list = {}".format(info_list))
@@ -199,16 +193,13 @@ class Exper :
                     roi_set_name = pair[1]
 
                     if prj_method not in prj_method_dict :
-                        sefl._prj_method_dict[prj_method] = [[channel, roi_set_name]]
+                        self._prj_method_dict[prj_method] = [[channel, roi_set_name]]
 
                     else :
-                        sefl._prj_method_dict[prj_method].append([channel, roi_set_name])
-
-
-        # print("prj_method_dict = {}".format(prj_method_dict))
-        # print("channels = {}".format(channels))
+                        self._prj_method_dict[prj_method].append([channel, roi_set_name])
 
     def create_hsegs(self) :
+        """find hseg directories and initialize hseg"""
         files = os.listdir(self.path)
         self._hsegs = []
         self._hseg_dict = {}
@@ -225,12 +216,7 @@ class Exper :
                     except Exception as e :
                         print("exception trying to init hseg {}: {}".format(file_name, e))
 
-
-
-
     ## </create properties>
-
-
 
 
     def create_out_dir(self) :
@@ -241,22 +227,31 @@ class Exper :
 
         return out_dir_path
 
-
-
     def get_channel_name(self, channel_num) :
         return self.channels[channel_num][0]
 
 
 
 
-
+## <to_string functions>
 
     def get_prefix(self) :
+        """For logging: prints name tabbed out appropriately"""
         return self.name + ':'
 
-
     def get_id(self) :
+        """
+        id = <exper.name>[_<hseg.name>[_<cell.name>[_<nuc.name>]]]
+        created by recursively calling parent.get_id()
+        ends the recursive calls by return self.name
+        """
         return self.name
+
 
     def __str__(self) :
         return self.get_id()
+
+    def __repr__(self) :
+        return self.get_id()
+
+    ## </to_string functions>

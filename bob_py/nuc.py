@@ -7,47 +7,60 @@ class Nuc :
         self.name = 'n' + str(self.id_num)
 
 
-        # self.roi = roi
-        # self.vor_roi = None
+        self._roi = roi
+        self._vor_roi = None
 
-    ## <properties>
+## <properties>
 
     def roi(self) :
         try :
             return self._roi
         except :
-            self.get_roi()
             return self._roi
 
     def vor_roi(self) :
-        try :
+        """use if none instead of try"""
+        if self._vor_roi != None :
             return self._vor_roi
-        except :
-            self.get_vor_roi()
+        else :
+            self.cell.create_vor_roi()
             return self._vor_roi
+        # try :
+        #     return self._vor_roi
+        # except :
+        #     self.cell.create_vor_roi()
+        #     return self._vor_roi
 
 
     ## </properties>
 
 
 
+## <to_string functions>
 
     def get_prefix(self) :
+        """For logging: prints name tabbed out appropriately"""
         return '  '*3 + self.get_long_name() + ':'
 
-
     def get_id(self) :
+        """
+        id = <exper.name>[_<hseg.name>[_<cell.name>[_<nuc.name>]]]
+        created by recursively calling parent.get_id()
+        """
         return '_'.join([self.cell.get_id(), self.name])
 
-    def short_id(self) :
-        s_id = self.get_id()
-        s_id = s_id.replace(self.cell.hseg.exper.name+'_','')
-        # print(self.cell.hseg.exper.name)
-        return s_id
+    def get_short_id(self) :
+        """
+        short_id = <hseg.name>[_<cell.name>[_<nuc.name>]]
+        created by recursively calling parent.get_short_id()
+        """
+        return '_'.join([self.cell.get_short_id(), self.name])
 
 
     def __str__(self) :
-        return self.short_id()
+        return self.get_short_id()
 
     def __repr__(self) :
-        return self.short_id()
+        return self.get_short_id()
+
+    ## </to_string functions>
