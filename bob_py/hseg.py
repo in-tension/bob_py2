@@ -169,12 +169,23 @@ class Hseg :
 
         # if UPDATE1 :
         IJ.run(self.nuc_bin(), "Invert", "")
+        # self.nuc_bin().show()
+        # len()
+        # from ij.gui import WaitForUserDialog
+        # wfug = WaitForUserDialog('butts')
+        # wfug.show()
 
         rt = ResultsTable.getResultsTable()
         rt.reset()
         IJ.run(self.nuc_bin(), "Analyze Particles...", "add")
 
         rois = rm.getRoisAsArray()
+        IJ.run(self.nuc_bin(),"Remove Overlay", "");
+        # self.nuc_bin().deleteRoi()
+        # self.nuc_bin().show()
+        # len()
+
+
         problem_nucs = []
         for roi in rois :
             nuc_cent = futils.roi_cent(roi, integer=True)
@@ -189,7 +200,6 @@ class Hseg :
             if not found_cell :
                 IJ.log('Nuc not in any cell for hemisegment {}'.format(self.name))
                 problem_nucs.append(roi)
-
         # print(self.cells['vl3'].nucs)
         return problem_nucs
 

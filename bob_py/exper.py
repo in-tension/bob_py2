@@ -55,6 +55,7 @@ class Exper :
             canceled = not IJ.showMessageWithCancel(__program__,'To proceed program will close all open images and windows, continue?')
 
         if not canceled :
+            IJ.run("Colors...", "foreground=white background=black selection=yellow");
 
             ## aspirational todo: identify current settings and return settings at the end
             ## set setting to save column headers

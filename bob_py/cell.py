@@ -47,6 +47,7 @@ class Cell :
             return self._nucs
         else :
             self.hseg.create_nucs()
+            return self._nucs
 
 
     ## </properties>
@@ -88,12 +89,12 @@ class Cell :
         IJ.run(nuc_bin_copy, "Clear Outside", "")
 
         IJ.run(nuc_bin_copy, "Voronoi", "")
-
+        # len()
         nuc_bin_copy.setRoi(None)
         ip = nuc_bin_copy.getProcessor()
         ip.setMinAndMax(0,1)
         IJ.run(nuc_bin_copy, "Apply LUT", "")
-        IJ.run(nuc_bin_copy, "Invert", "")
+        # IJ.run(nuc_bin_copy, "Invert", "")
 
         nuc_bin_copy.setRoi(self.roi())
         IJ.run(nuc_bin_copy, "Analyze Particles...", "add")
@@ -117,7 +118,7 @@ class Cell :
         print("match_vor_nuc")
         rm = RoiManager.getRoiManager()
         nuc_inds = [x for x in range(len(self.nucs()))]
-        print(nuc_inds)
+        # print(nuc_inds)
         for vor_roi in vor_rois :
             # print(vor_roi)
             # print(nuc_inds)
@@ -125,12 +126,12 @@ class Cell :
             temp = None
             for i, nuc_ind in enumerate(nuc_inds) :
                 nuc_roi = self.nucs()[nuc_ind].roi()
-                print('\t{}'.format(nuc_roi))
+                # print('\t{}'.format(nuc_roi))
 
                 nuc_cent = futils.roi_cent(nuc_roi, integer=True)
 
                 if vor_roi.contains(*nuc_cent) :
-                    print("huh")
+                    # print("huh")
                     self.nucs()[nuc_ind]._vor_roi = vor_roi
                     ## I don't think I need to do this, I could just use i outside of loop but it feels so insecure or something
                     temp = i
