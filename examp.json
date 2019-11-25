@@ -23,11 +23,12 @@ Remove outliers dark 1px
 todo: add option to use something other than default conv settings
 
 "channels" : {
-  "channel_num": ["channel_name(arbitrary)", ["projection_method", "roi_set"]]
-  "channel2": ["name": ["prj1", "rois1"], ["prj2", "rois2"]]
+  "channel_num": ["channel_name(arbitrary)", "channel_abbr" ["projection_method", "roi_set"]]
+  "channel2": ["name", "abbr" ["prj1", "rois1"], ["prj2", "rois2"]]
 }
 
 a channel can have multiple projection_method, roi_set pairs, like "channel2" above
+abbr -> abbreviation - used for column headings
 
 "projection_method" = one of ["avg", "min", "max", "sum", "sd", "median"]
 
@@ -37,10 +38,10 @@ a channel can have multiple projection_method, roi_set pairs, like "channel2" ab
 json:{
 
   "channels": {
-    "1": ["H3K9ac", ["sum", "nucs"]],
-    "2": ["Fibrillarian", ["sum", "nucs"]],
-    "3": ["Phalloidin", null],
-    "4": ["Hoechst", ["sum", "nucs"]]
+    "1": ["H3K9ac", "h3k9ac", ["sum", "nucs"]],
+    "2": ["Fibrillarian", "Fib" ["sum", "nucs"]],
+    "3": ["Phalloidin", "Phalloidin" null],
+    "4": ["Hoechst", "Hoe", ["sum", "nucs"]]
   },
 
 

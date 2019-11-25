@@ -7,7 +7,8 @@ class Nuc :
         self.name = 'n' + str(self.id_num)
 
 
-        self._roi = roi
+        self._roi = roi             ## roi could be a member variable instead of a property but that would mean you'd have to remember what things were properties or not
+        
         self._vor_roi = None
 
 ## <properties>

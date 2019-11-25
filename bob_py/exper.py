@@ -156,6 +156,8 @@ class Exper :
             return self._calc_dict
 
 
+    def conv_headings() :
+        pass
 
     ## </properties>
 
@@ -186,12 +188,12 @@ class Exper :
             self._prj_method_dict = {}
 
             for channel, info_list in channels.items() :
-                if info_list[1] == None :
+                if info_list[2] == None :
                     continue
 
-                channel_name = info_list[0]
+                channel_name = info_list[1]
                 print("info_list = {}".format(info_list))
-                for pair in info_list[1:] :
+                for pair in info_list[2:] :
                     # print(pair)
                     prj_method = pair[0]
                     roi_set_name = pair[1]

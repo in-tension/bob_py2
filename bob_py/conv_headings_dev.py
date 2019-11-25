@@ -20,20 +20,13 @@ cell_conv_hdings = [
     "Avg_Ploidy",
     "Sum_Ploidy",
 
-    "Avg_IntDen_Hoe",
+    "Avg_IntDen_Hoe",       ## HoeAvgIntDen or Hoe_Avg_IntDen
     "Sum_IntDen_Hoe",
 
     "Avg_Mean_Fib",
     "Sum_Mean_Fib",
     "Avg_IntDen_Fib",
     "Sum_IntDen_Fib"
-]
-
-
-vor_conv_hdings = [
-
-
-
 ]
 
 
@@ -47,12 +40,6 @@ nuc_conv_hdings = {
         "AR",
         "NND"
         "Norm_NND"
-    ],
-    "vor": [        ## in the order do you want voronoi
-        "Area",
-        "Norm_Area",
-        "Perim",
-        "AreaFrac"
     ],
     "hoe": [
         "Mean",
@@ -79,5 +66,11 @@ nuc_conv_hdings = {
         "RawIntDen",
         "AreaFrac",
         "Area"
+    ],
+    "vor": [        ## in the order do you want voronoi
+        "Area",
+        "Norm_Area",
+        "Perim",
+        "AreaFrac"
     ]
 }

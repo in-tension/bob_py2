@@ -1,0 +1,44 @@
+uc_conv_hdings = {
+    "geo": [
+        "Area_Nuc",
+        "Norm_Area_Nuc",
+        "X_Nuc",
+        "Rel_Y_Nuc",
+        "Perim_Nuc"
+        "AR_Nuc",
+        "NND_Nuc"
+        "Norm_NND_Nuc"
+    ],
+    "hoe": [
+        "Mean_Hoe",
+        "Norm_Mean_Hoe",
+        "StdDev_Hoe",
+        "IntDen_Hoe",
+        "Norm_IntDen_Hoe"
+        "RawIntDen_Hoe",
+        "Ploidy_IntDen_Hoe_name:Ploidy",
+        "Norm_Ploidy"
+    ],
+    "h3k9ac": [
+        "Mean",
+        "StdDev",
+        "IntDen",
+        "Norm_IntDen",
+        "RawIntDen"
+    ],
+    "fib": [
+        "Mean",
+        "Norm_Mean"
+        "StdDev",
+        "IntDen",
+        "RawIntDen",
+        "AreaFrac",
+        "Area"
+    ],
+    "vor": [        ## in the order do you want voronoi
+        "Area",
+        "Norm_Area",
+        "Perim",
+        "AreaFrac"
+    ]
+}

@@ -23,6 +23,13 @@ class Cell :
         self._nucs = []
         self._nuc_dict = {}
 
+        self._nuc_roi_dict = None
+        self._vor_roi_dict = None
+        self._nuc_geo_data = None
+        self._vor_geo_data = None
+
+        self._nuc_intens_data = {}
+
 ## <properties>
 
     def roi(self) :
@@ -48,6 +55,43 @@ class Cell :
         else :
             self.hseg.create_nucs()
             return self._nucs
+
+
+    def nuc_roi_dict(self) :
+        if self._nuc_roi_dict != None :
+            return self._nuc_roi_dict
+        else :
+            self.hseg.create_roi_dicts()
+            return self._nuc_roi_dict
+
+    def vor_roi_dict(self) :
+        if self._vor_roi_dict != None :
+            return self._vor_roi_dict
+        else :
+            self.hseg.create_roi_dicts()
+            return self._vor_roi_dict
+
+    def nuc_geo_data(self) :
+        if self._nuc_geo_data != None :
+            return self._nuc_geo_data
+        else :
+            self.hseg.create_geo_data()
+            return self._nuc_geo_data
+
+    def vor_geo_data(self) :
+        if self._vor_geo_data != None :
+            return self._vor_geo_data
+        else :
+            self.hseg.create_geo_data()
+            return self._vor_geo_data
+
+
+    def nuc_intens_data(self) :
+        if len(self._nuc_intens_data) > 0 :
+            return self._nuc_intens_data
+        else :
+            self.hseg.create_intens_data()
+            return self._nuc_intens_data
 
 
     ## </properties>
