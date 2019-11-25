@@ -1,0 +1,57 @@
+https://tobloef.com/text2mindmap/
+
+bob_py
+	Exper
+		variables
+			name
+			path
+		properties
+			hsegs()
+			hseg_dict()
+			channels()
+			prj_method_dict()
+			hseg_slices()
+			calc_dict()
+		methods
+			create_out_dir()
+			get_channel_name(num)
+
+	Hseg
+		variables
+			exper
+			name
+			path
+		properties
+			file_dict()
+			cell_file_dict()
+			raw_stack()
+			cal()
+			nuc_bin()
+			cells()
+			roi_dict()
+		methods
+			get_roi_dict(name)
+			open_hseg_imp(suf)
+
+
+
+	Cell
+		variables
+			hseg
+			name
+			roi_csv_path
+		properties
+			roi()
+			nucs()
+		methods
+			add_nuc()
+
+
+	Nuc
+		variables
+			cell
+			name
+			id_num
+		properties
+			roi()
+			vor_roi()

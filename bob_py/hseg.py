@@ -35,8 +35,8 @@ class Hseg :
     RAW_SUF = '.tif'
     NUC_BIN_SUF = '_Nuc-bin.tif'
 
-    JSON_SUF = '.json'
-    JSON_SPLIT_CHAR = 'json:'
+    JSON_SUF = '.json'              ## why is this here and not in exper?
+    JSON_SPLIT_CHAR = 'json:'       ## why is this here and not in exper?
 
     CELL_SUF_REGEX = '_XY-([^\.]*).csv'
     CELL_SUF_PATTERN = re.compile(CELL_SUF_REGEX)
@@ -111,8 +111,56 @@ class Hseg :
             self.create_cells()
             return self._cells
 
+    def roi_dicts(self) :
+        """
+        _roi_dicts {
+            "Cell" : { "cell_id":cell_roi },
+            "Vor" : { "vor_id":vor_roi },
+            "Nuc" : { "nuc_id":nuc_roi },
+        }
+        use caps for keys or not?
 
+        currently those 3 roi_sets are hard coded in,
+        but it should be possible to make it more general
+        """
+        try :
+            return self._roi_dicts
+        except :
+            self.create_roi_dicts()
+            return self._roi_dicts
 
+    # def cell_roi_dict() :
+    #     """
+    #     dict { name(str) = roi }
+    #     roi_dicts can be used with fiji_utils/futils' measure_roi_dict, meas_rdict_geo, meas_rdict_intens
+    #     """
+    #     try :
+    #         return self._cell_roi_dict
+    #     except :
+    #         self.create_all_roi_dicts()
+    #         return self._cell_roi_dict
+    #
+    # def nuc_roi_dict() :
+    #     """
+    #     dict { name(str) = roi }
+    #     roi_dicts can be used with fiji_utils/futils' measure_roi_dict, meas_rdict_geo, meas_rdict_intens
+    #     """
+    #     try :
+    #         return self._nuc_roi_dict
+    #     except :
+    #         self.create_all_roi_dicts()
+    #         return self._nuc_roi_dict
+    #
+    # def vor_roi_dict() :
+    #     """
+    #     dict { name(str) = roi }
+    #     roi_dicts can be used with fiji_utils/futils' measure_roi_dict, meas_rdict_geo, meas_rdict_intens
+    #     """
+    #     try :
+    #         return self._vor_roi_dict
+    #     except :
+    #         self.create_all_roi_dicts()
+    #         return self._vor_roi_dict
 
 
     ## </properties>
@@ -120,7 +168,7 @@ class Hseg :
 ## <create properties>
 
 
-    def make_file_dicts(self) :
+    def make_file_dicts(self) :     ## change to create?
         """
             makes
             - _file_dict
@@ -203,11 +251,44 @@ class Hseg :
         # print(self.cells['vl3'].nucs)
         return problem_nucs
 
+    # def create_all_roi_dicts(self) :
+    #     self._cell_roi_dict = {}
+    #     for cell in self.cells :
+    #         label = cell.get_id().replace(self.exper.name, '')
+    #         self._cell_roi_dict[label] = cell.roi
+    #
+    #
+    #     self._self._vor_roi_dict = {}
+    #     vor_roi_dict = {}
+    #     for cell in self.cells :
+    #         for nuc in cell.nucs :
+    #             label = nuc.get_id().replace(self.exper.name + '_', '')
+    #
+    #             self._self._vor_roi_dict[label] = nuc.roi
+    #             vor_roi_dict[label] = nuc.vor_roi
+    #
+    #     # return self._cell_roi_dict, self._self._vor_roi_dict, vor_roi_dict
+    #
+
+    def create_roi_dicts(self) :
+        self._roi_dicts = {"Cell":{}, "Vor":{}, "Nuc":{}}
+        for cell in self.cells() :
+            label = cell.get_short_id()
+            self._roi_dicts["Cell"][label] = cell.roi()
+
+        for cell in self.cells() :
+            for nuc in cell.nucs() :
+                label = nuc.get_short_id()
+
+                self._roi_dicts["Nuc"][label] = nuc.roi()
+                self._roi_dicts["Vor"][label] = nuc.vor_roi()
+
 
     ## </create properties>
 
 
-
+    def get_roi_dict(self, roi_dict_name) :
+        return self.roi_dicts()[roi_dict_name]
 
     def open_hseg_imp(self, suf) :
         """open imp which starts with <hseg.get_id()>_<suf>"""

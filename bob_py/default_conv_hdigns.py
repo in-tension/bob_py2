@@ -20,8 +20,8 @@ cell_conv_hdings = [
     "Avg_Ploidy",
     "Sum_Ploidy",
 
-    "IntDen_Hoe",
-    "IntDen_Hoe",
+    "Avg_IntDen_Hoe",
+    "Sum_IntDen_Hoe",
 
     "Avg_Mean_Fib",
     "Sum_Mean_Fib",

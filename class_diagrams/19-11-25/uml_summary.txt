@@ -1,0 +1,23 @@
+,--------------------.                                                                             
+|Exper               |  ,-------------------.                                                      
+|--------------------|  |Hseg               |   ,--------------------.                             
+|.. Variables ..     |  |-------------------|   |Cell                |                             
+|+name               |  |.. Variables ..    |   |--------------------|                             
+|+path               |  |+exper             |   |.. Variables ..     |   ,------------------------.
+|                    |  |+name              |   |+hseg               |   |Nuc                     |
+|.. Properties ..    |  |+path              |   |+name               |   |------------------------|
+|                    |  |                   |   |+roi_csv_path       |   |.. Instance Variables ..|
+|.. Methods ..       |  |.. Properties ..   |   |                    |   |+cell                   |
+|                    |  |                   |   |.. Properties ..    |   |+name                   |
+|.. Static Methods ..|  |.. Methods ..      |   |                    |   |+id_num                 |
+|--------------------|--|-------------------|---|.. Methods ..       |---|                        |
+|+hsegs()            |  |+file_dict()       |   |                    |   |.. Properties ..        |
+|+hseg_dict()        |  |+cell_file_dict()  |   |.. Static Methods ..|   |------------------------|
+|+channels()         |  |+raw_stack()       |   |--------------------|   |+roi()                  |
+|+prj_method_dict()  |  |+cal()             |   |+roi()              |   |+vor_roi()              |
+|+hseg_slices()      |  |+nuc_bin()         |   |+nucs()             |   `------------------------'
+|+calc_dict()        |  |+cells()           |   |~add_nuc()          |                             
+|~create_out_dir()   |  |+roi_dicts()       |   |#read_roi_csv(cal)  |                             
+|~get_channel_name() |  |~get_roi_dict(name)|   `--------------------'                             
+|#setup()            |  |~open_hseg_imp(suf)|                                                      
+`--------------------'  `-------------------'                                                      

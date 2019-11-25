@@ -1,0 +1,81 @@
+@startuml
+
+title bob_py 11/25/19
+
+skinparam componentStyle uml2
+class Exper {
+  .. Variables ..
+    + name
+    + path
+
+  .. Properties ..
+    + hsegs()
+    + hseg_dict()
+    + channels()
+    + prj_method_dict()
+    + hseg_slices()
+    + calc_dict()
+
+  .. Methods ..
+    ~ create_out_dir()
+    ~ get_channel_name()
+
+  .. Static Methods ..
+    # setup()
+}
+
+class Hseg {
+  .. Variables ..
+    + exper
+    + name
+    + path
+
+  .. Properties ..
+    + file_dict()
+    + cell_file_dict()
+    + raw_stack()
+    + cal()
+    + nuc_bin()
+    + cells()
+    + roi_dicts()
+
+  .. Methods ..
+    ~ get_roi_dict(name)
+    ~ open_hseg_imp(suf)
+}
+
+class Cell {
+  .. Variables ..
+    + hseg
+    + name
+    + roi_csv_path
+
+  .. Properties ..
+    + roi()
+    + nucs()
+
+  .. Methods ..
+    ~ add_nuc()
+
+  .. Static Methods ..
+    # read_roi_csv(cal)
+}
+
+class Nuc {
+  .. Instance Variables ..
+    + cell
+    + name
+    + id_num
+
+  .. Properties ..
+    + roi()
+    + vor_roi()
+}
+
+
+Exper *-right- Hseg
+Hseg *-right- Cell
+Cell *-right- Nuc
+
+
+@enduml

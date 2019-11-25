@@ -1,0 +1,52 @@
+                                     ,---------------------------------.                                                                   
+                                     |Hseg                             |                                                                   
+                                     |---------------------------------|                                                                   
+                                     |.. Class Constants ..            |                                                                   
+,---------------------------------.  |-RAW_SUF                         |                                                                   
+|Exper                            |  |-NUC_BIN_SUF                     |                                                                   
+|---------------------------------|  |                                 |                                                                   
+|.. Class Constants ..            |  |-JSON_SUF                        |                                                                   
+|-IN_DEV                          |  |-JSON_SPLIT_CHAR                 |                                                                   
+|-ONE_HSEG                        |  |                                 |                                                                   
+|-CATCH                           |  |-CELL_SUF_REGEX                  |                                                                   
+|-PRINT_PROGRESS                  |  |-CELL_SUF_PATTERN                |                                                                   
+|                                 |  |                                 |   ,---------------------------------.                             
+|-JSON_KEY_SLICES                 |  |-CELL_ROI_DICT_NAME              |   |Cell                             |                             
+|-JSON_KEY_CHANNELS               |  |-NUC_ROI_DICT_NAME               |   |---------------------------------|                             
+|-JSON_KEY_CALC                   |  |-VOR_ROI_DICT_NAME               |   |.. Instance Variables ..         |                             
+|-JSON_SUF                        |  |                                 |   |+hseg                            |                             
+|-JSON_SPLIT_CHAR                 |  |.. Instance Variables ..         |   |+name                            |   ,------------------------.
+|                                 |  |+exper                           |   |+roi_csv_path                    |   |Nuc                     |
+|-TEMP_OUT_DIR                    |  |+name                            |   |.. Properties ..                 |   |------------------------|
+|                                 |  |+path                            |   |                                 |   |.. Instance Variables ..|
+|.. Instance Variables ..         |  |.. Properties ..                 |   |.. Methods - create properties ..|   |+cell                   |
+|+name                            |  |                                 |   |                                 |   |+name                   |
+|+path                            |  |                                 |   |.. Methods - toString ..         |   |+id_num                 |
+|.. Properties ..                 |  |                                 |   |                                 |   |.. Properties ..        |
+|                                 |  |.. Methods - create properties ..|   |.. Static Methods ..             |   |                        |
+|.. Methods - create properties ..|--|.. Methods ..                    |---|---------------------------------|---|.. Methods - toString ..|
+|.. Methods ..                    |  |.. Methods - toString ..         |   |+roi()                           |   |------------------------|
+|.. Methods - toString ..         |  |---------------------------------|   |+nucs()                          |   |+roi()                  |
+|                                 |  |+file_dict()                     |   |~add_nuc()                       |   |+vor_roi()              |
+|.. Static Methods ..             |  |+cell_file_dict()                |   |~create_vor_roi()                |   |~get_prefix()           |
+|---------------------------------|  |                                 |   |~creating_vor_roi()              |   |~get_id()               |
+|+hsegs()                         |  |+raw_stack()                     |   |~match_vor_nuc()                 |   |~get_short_id()         |
+|+hseg_dict()                     |  |+cal()                           |   |~get_prefix()                    |   |~__str__()              |
+|+channels()                      |  |+nuc_bin()                       |   |~get_id()                        |   |~__repr__()             |
+|+prj_method_dict()               |  |                                 |   |~get_short_id()                  |   `------------------------'
+|+hseg_slices()                   |  |+cells()                         |   |~__str__()                       |                             
+|+calc_dict()                     |  |+roi_dicts()                     |   |~__repr__()                      |                             
+|~load_json_info()                |  |~make_file_dict()                |   |#read_roi_csv(cal)               |                             
+|~create_hsegs()                  |  |~open_raw_stack()                |   `---------------------------------'                             
+|~create_out_dir()                |  |~create_cells()                  |                                                                   
+|~get_channel_name()              |  |~create_nucs()                   |                                                                   
+|~get_prefix()                    |  |~create_roi_dicts()              |                                                                   
+|~get_id()                        |  |~get_roi_dict(roi_dict_name)     |                                                                   
+|~__str__()                       |  |~open_hseg_imp(suf)              |                                                                   
+|~__repr__()                      |  |~get_prefix()                    |                                                                   
+|#setup()                         |  |~get_id()                        |                                                                   
+`---------------------------------'  |~get_short_id()                  |                                                                   
+                                     |                                 |                                                                   
+                                     |~__str__()                       |                                                                   
+                                     |~__repr__()                      |                                                                   
+                                     `---------------------------------'                                                                   

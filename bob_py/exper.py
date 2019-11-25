@@ -162,7 +162,10 @@ class Exper :
 ## <create properties>
 
     def load_json_info(self) :
-        """read json file with metadata and intialize relevant properties"""
+        """
+        read json file with metadata and intialize relevant properties
+        creates channels, prj_method_dict, and hseg_slices
+        """
         json_file_path = os.path.join(self.path, self.name + Exper.JSON_SUF)
 
         if not os.path.exists(json_file_path) :

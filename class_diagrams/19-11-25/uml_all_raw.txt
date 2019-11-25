@@ -1,0 +1,148 @@
+@startuml
+
+title bob_py 11/25/19
+
+
+skinparam componentStyle uml2
+class Exper {
+  .. Class Constants ..
+    - IN_DEV
+    - ONE_HSEG
+    - CATCH
+    - PRINT_PROGRESS
+
+    - JSON_KEY_SLICES
+    - JSON_KEY_CHANNELS
+    - JSON_KEY_CALC
+    - JSON_SUF
+    - JSON_SPLIT_CHAR
+
+    - TEMP_OUT_DIR
+
+  .. Instance Variables ..
+    + name
+    + path
+  .. Properties ..
+    + hsegs()
+    + hseg_dict()
+    + channels()
+    + prj_method_dict()
+    + hseg_slices()
+    + calc_dict()
+
+  .. Methods - create properties ..
+    ~ load_json_info()
+    ~ create_hsegs()
+  .. Methods ..
+    ~ create_out_dir()
+    ~ get_channel_name()
+  .. Methods - toString ..
+      ~ get_prefix()
+      ~ get_id()
+      ~ __str__()
+      ~ __repr__()
+
+  .. Static Methods ..
+    # setup()
+}
+
+class Hseg {
+  .. Class Constants ..
+    - RAW_SUF
+    - NUC_BIN_SUF
+
+    - JSON_SUF
+    - JSON_SPLIT_CHAR
+
+    - CELL_SUF_REGEX
+    - CELL_SUF_PATTERN
+
+    - CELL_ROI_DICT_NAME
+    - NUC_ROI_DICT_NAME
+    - VOR_ROI_DICT_NAME
+
+  .. Instance Variables ..
+    + exper
+    + name
+    + path
+  .. Properties ..
+    + file_dict()
+    + cell_file_dict()
+
+    + raw_stack()
+    + cal()
+    + nuc_bin()
+
+    + cells()
+    + roi_dicts()
+
+  .. Methods - create properties ..
+    ~ make_file_dict()
+    ~ open_raw_stack()
+    ~ create_cells()
+    ~ create_nucs()
+    ~ create_roi_dicts()
+  .. Methods ..
+    ~ get_roi_dict(roi_dict_name)
+    ~ open_hseg_imp(suf)
+  .. Methods - toString ..
+    ~ get_prefix()
+    ~ get_id()
+    ~ get_short_id()
+
+    ~ __str__()
+    ~ __repr__()
+
+}
+
+class Cell {
+  .. Instance Variables ..
+    + hseg
+    + name
+    + roi_csv_path
+  .. Properties ..
+    + roi()
+    + nucs()
+
+  .. Methods - create properties ..
+    ~ add_nuc()
+    ~ create_vor_roi()
+    ~ creating_vor_roi()
+    ~ match_vor_nuc()
+
+  .. Methods - toString ..
+      ~ get_prefix()
+      ~ get_id()
+      ~ get_short_id()
+      ~ __str__()
+      ~ __repr__()
+
+  .. Static Methods ..
+    # read_roi_csv(cal)
+}
+
+class Nuc {
+  .. Instance Variables ..
+    + cell
+    + name
+    + id_num
+  .. Properties ..
+    + roi()
+    + vor_roi()
+
+  .. Methods - toString ..
+      ~ get_prefix()
+      ~ get_id()
+      ~ get_short_id()
+      ~ __str__()
+      ~ __repr__()
+
+}
+
+
+Exper *-right- Hseg
+Hseg *-right- Cell
+Cell *-right- Nuc
+
+
+@enduml
