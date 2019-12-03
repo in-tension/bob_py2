@@ -23,12 +23,14 @@ class Cell :
         self._nucs = []
         self._nuc_dict = {}
 
-        self._nuc_roi_dict = None
-        self._vor_roi_dict = None
-        self._nuc_geo_data = None
-        self._vor_geo_data = None
+        self._roi_dicts = {}
+        # self._nuc_roi_dict = None
+        # self._vor_roi_dict = None
+        # self._nuc_geo_data = None
+        # self._vor_geo_data = None
 
-        self._nuc_intens_data = {}
+        # self._nuc_intens_data = {}
+        self._data = {}
 
 ## <properties>
 
@@ -55,6 +57,54 @@ class Cell :
         else :
             self.hseg.create_nucs()
             return self._nucs
+
+    def roi_dicts(self, roi_dict_name) :
+        try :
+            return self._roi_dicts[roi_dict_name]
+        except :
+            self.create_roi_dict(roi_dict_name)
+            return self._roi_dicts[roi_dict_name]
+
+    def create_roi_dict(self, roi_dict_name) :
+        self._roi_dicts[roi_dict_name] = {}
+        if roi_dict_name == "nuc" :
+            for nuc in self.nucs() :
+                label = nuc.get_short_id()
+
+                self._roi_dicts[roi_dict_name][label] = nuc.roi()
+        elif roi_dict_name == "vor" :
+            for nuc in self.nucs() :
+                label = nuc.get_short_id()
+
+                self._roi_dicts[roi_dict_name][label] = nuc.vor_roi()
+
+
+    def data(self, data_key) :
+        try :
+            return self._data[data_key]
+        except :
+            self.create_data(data_key)
+            return self._data[data_key]
+
+    def create_data(self, data_key) :
+        roi_dict_name = data_key[0]
+        roi_dict = self.roi_dicts(roi_dict_name)
+        # print(roi_dict)
+        imp_info = data_key[1]
+
+        if imp_info[0] == "geo" :
+            new_data = futils.meas_rdict_geo(self.hseg.raw_stack(), roi_dict)
+            self._data[data_key] = new_data
+
+        elif imp_info[0] == "intens" :
+            # print('cell:create_data: imp_info = {}'.format(imp_info))
+            imp = self.hseg.get_prj_imp_ch(*imp_info[1:])
+            new_data = futils.meas_rdict_intens(imp, roi_dict)
+            self._data[data_key] = new_data
+
+
+        else :
+            raise('crap')
 
 
     def nuc_roi_dict(self) :
@@ -94,6 +144,8 @@ class Cell :
             return self._nuc_intens_data
 
 
+
+
     ## </properties>
 
 ## <create properties>
@@ -121,7 +173,7 @@ class Cell :
         """
         runs voronoi on cell to create vor_rois
         """
-        print('creating_vor_roi')
+        # print('creating_vor_roi')
         rm = RoiManager.getRoiManager()
         rm.reset()
         d = Duplicator()
@@ -159,7 +211,7 @@ class Cell :
         """
         # if IJ.escapePressed() : IJ.exit()
 
-        print("match_vor_nuc")
+        # print('match_vor_nuc')
         rm = RoiManager.getRoiManager()
         nuc_inds = [x for x in range(len(self.nucs()))]
         # print(nuc_inds)
@@ -191,7 +243,7 @@ class Cell :
                     IJ.log('{}. ({},{})'.format(i,x,y))
                     futils.add_roi(Roi(x,y,10,10), str(i))
                 IJ.log(str(nuc_inds))
-                futils.add_roi(vor_roi, "vor_roi")
+                futils.add_roi(vor_roi, 'vor_roi')
 
                 ## raise RuntimeError('self: {}, issue with voronoi nuc match up'.format(self.name))
 

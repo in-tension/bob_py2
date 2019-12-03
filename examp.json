@@ -28,7 +28,7 @@ todo: add option to use something other than default conv settings
 }
 
 a channel can have multiple projection_method, roi_set pairs, like "channel2" above
-abbr -> abbreviation - used for column headings
+abbr -> abbreviation - used for column headings and stuff
 
 "projection_method" = one of ["avg", "min", "max", "sum", "sd", "median"]
 

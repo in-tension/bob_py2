@@ -2,6 +2,7 @@
 import os
 import sys
 import imp
+from pprint import pprint
 
 cwd = '/Users/baylieslab/Documents/Amelia/code_dev/projects/bob_py/bob_py_lazy_init'
 sys.path.append(cwd)
@@ -39,12 +40,8 @@ h = exp.hsegs()[0]
 c = h.cells()[0]
 n = c.nucs()[0]
 
-cell_roi_dict = h.get_roi_dict("Cell")
-#print(cell_roi_dict)
 
-
-
-
+h.ihe()
 
 
 br.ptoc(t)

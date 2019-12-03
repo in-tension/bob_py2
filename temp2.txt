@@ -1,0 +1,55 @@
+
+
+
+class_bob_data :
+
+    level_and_rois = "cell", "nuc", "vor"
+
+    param = [param] or [param, prj_method, channel]
+
+
+    def get_data(level, param) :
+        if level == "cell" :
+            return get_cell_data(param)
+        else :
+            return get_sub_cell_data(level, param)
+
+    def get_cell_data(param) :
+        return self.cell_data[param]
+
+    def get_sub_cell_data(param)
+
+
+
+
+
+exper.data
+
+    if exists return
+    ("cell", param) : double
+    ("cell", (param, prj_method, channel)) : double
+
+    ("nuc" or "vor", param) : double[]
+    ("nuc" or "vor", (param, prj_method, channel)) : double[]
+
+    else
+        ("cell", param) :
+            get_geo_data()
+        ("cell", (param, prj_method, channel)) : double
+
+        ("nuc" or "vor", param) : double[]
+        ("nuc" or "vor", (param, prj_method, channel)) : double[]
+
+
+
+
+
+
+roi_sets{
+"cell": {param : [func-to-get-imp, func-to-get-roiset]}
+
+
+{"nuc": {param : [raw_stack, cell_roi_set]}}
+"vor" or "nuc": {"hseg":}
+
+}

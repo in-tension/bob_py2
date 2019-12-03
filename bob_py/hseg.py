@@ -26,7 +26,7 @@ import brutils as br
 import fiji_utils as futils
 
 from .cell import Cell
-
+from .bob_exception import BobException
 
 
 
@@ -41,9 +41,14 @@ class Hseg :
     CELL_SUF_REGEX = '_XY-([^\.]*).csv'
     CELL_SUF_PATTERN = re.compile(CELL_SUF_REGEX)
 
-    CELL_ROI_DICT_NAME = "cells"
-    NUC_ROI_DICT_NAME = "nucs"
-    VOR_ROI_DICT_NAME = "vors"
+
+    # CELL_ROI_DICT_NAME = "cell"
+    #
+    # GEO = "geo"
+    # INTENS = ""
+    # NUC_ROI_DICT_NAME = "nucs"
+    # VOR_ROI_DICT_NAME = "vors"
+
 
 
 
@@ -52,6 +57,9 @@ class Hseg :
         self.exper = exper
         self.name = dir_name.replace(self.exper.name+'_', '')
         self.path = os.path.join(self.exper.path, dir_name)
+
+        self._prj_imps = {}
+        self._data = {}
 
 
 
@@ -80,6 +88,13 @@ class Hseg :
         except :
             self.make_file_dicts()
             return self._cell_file_dict
+
+    def slices(self) :
+        try :
+            return self._slices
+        except :
+            self._slices = self.exper.hseg_slices()[self.name]
+            return self._slices
 
 
     def raw_stack(self) :
@@ -112,51 +127,90 @@ class Hseg :
             return self._cells
 
 
-    def roi_dicts(self) :
-        """
-        _roi_dicts {
-            "Cell" : { "cell_id":cell_roi },
-            "Vor" : { "vor_id":vor_roi },
-            "Nuc" : { "nuc_id":nuc_roi },
-        }
-        use caps for keys or not?
+    # def cell_roi_dict(self) :
+    #     """
+    #     dict { name(str) = roi }
+    #     roi_dicts can be used with fiji_utils/futils' measure_roi_dict, meas_rdict_geo, meas_rdict_intens
+    #     """
+    #     try :
+    #         return self._cell_roi_dict
+    #     except :
+    #         self.create_roi_dicts()
+    #         return self._cell_roi_dict
 
-        currently those 3 roi_sets are hard coded in,
-        but it should be possible to make it more general
+    # def cell_geo_data(self) :
+    #     try :
+    #         return self._cell_geo_data
+    #     except :
+    #         self.create_geo_data()
+    #         return self._cell_geo_data
+    #
+
+    def prj_imps(self, prj_method) :
+        try :
+            return self._prj_imps[prj_method]
+        except :
+            self.create_prj_imp(prj_method)
+            return self._prj_imps[prj_method]
+        # if id in self._prj_imps :
+        #     return self._prj_imps[""]
+        # if len(self._prj_imps) > 0 :
+        #     return self._prj_imps
+        # else :
+        #     self.create_prj_imps()
+        #     return self._prj_imps
+
+
+    def roi_dicts(self, roi_dict_name) :
+        try :
+            return self._roi_dicts[roi_dict_name]
+        except :
+            self.create_roi_dicts(roi_dict_name)
+            return self._roi_dicts[roi_dict_name]
+
+
+    def create_roi_dicts(self, roi_dict_name) :
+        # self._cell_roi_dict = {}
+
+        if roi_dict_name == "cell" :
+            self._roi_dicts = {"cell":{}}
+            for cell in self.cells() :
+                label = cell.get_id().replace(self.exper.name, '')
+                self._roi_dicts["cell"][label] = cell.roi()
+        else :
+            raise Exception('no roi_dict in hseg called {}'.format(roi_dict_name))
+
+    def data(self, data_key) :
+        """ key = (roi_dict_name, (imp_info))
+        imp_info = (("geo"))
+            or
+                 = (("intens", prj_method, channel)
         """
         try :
-            return self._roi_dicts
+            return self._data[data_key]
         except :
-            self.create_roi_dicts()
-            return self._roi_dicts
+            self.create_data(data_key)
+            return self._data[data_key]
 
-    def cell_roi_dict(self) :
-        """
-        dict { name(str) = roi }
-        roi_dicts can be used with fiji_utils/futils' measure_roi_dict, meas_rdict_geo, meas_rdict_intens
-        """
-        try :
-            return self._cell_roi_dict
-        except :
-            self.create_roi_dicts()
-            return self._cell_roi_dict
+    def create_data(self, data_key) :
+        roi_dict_name = data_key[0]
+        # print(data_key)
+        roi_dict = self.roi_dicts(roi_dict_name)
+        # print(roi_dict)
+        imp_info = data_key[1]
 
-    def cell_geo_data(self) :
-        try :
-            return self._cell_geo_data
-        except :
-            self.create_geo_data()
-            return self._cell_geo_data
+        if imp_info[0] == "geo" :
+            new_data = futils.meas_rdict_geo(self.raw_stack(), roi_dict)
+            self._data[data_key] = new_data
+
+        elif imp_info[0] == "intens" :
+            imp = sefl.get_prj_imp_ch(*imp_info)
+            new_data = futils.meas_rdict_intens(imp, roi_dict)
+            self._data[data_key] = new_data
 
 
-    def prj_imps(self) :
-        try :
-            return self._prj_imps
-        except :
-            self.create_prj_imps()
-            return self._prj_imps
-
-
+        else :
+            raise(BobException('crap Hseg.create_data, data_key is wrong'))
 
     ## </properties>
 
@@ -185,7 +239,6 @@ class Hseg :
                 else :
                     self._file_dict[suf] = file_path
 
-
     def open_raw_stack(self) :
         """
             creates
@@ -202,8 +255,6 @@ class Hseg :
         for cell_name, cell_path in self.cell_file_dict().items() :
             self._cells.append(Cell(self, cell_name, cell_path))
             self._cell_dict[cell_name] = len(self._cells) - 1
-
-
 
     def create_nucs(self) :
         """ """
@@ -246,66 +297,112 @@ class Hseg :
         # print(self.cells['vl3'].nucs)
         return problem_nucs
 
-    def create_roi_dicts(self) :
-        self._cell_roi_dict = {}
-        for cell in self.cells :
-            label = cell.get_id().replace(self.exper.name, '')
-            self._cell_roi_dict[label] = cell.roi
+    def ihe(self, sheet_dict) :
 
-        for cell in self.cells() :
-            for nuc in cell.nucs() :
-                label = nuc.get_short_id()
+        for sheet_dict in ihe_dict.values() :
 
-                cell._nuc_roi_dict[label] = nuc.roi()
-                cell._vor_roi_dict[label] = nuc.vor_roi()
-
-    def create_geo_data(self) :
-        self._cell_geo_data = futils.meas_rdict_geo(self.nuc_bin, self.cell_roi_dict())
-
-        for cell in self.cells :
-            cell._vnuc_geo_data = futils.meas_rdict_geo(self.nuc_bin, cell.nuc_roi_dict())
-            cell._vor_geo_data = futils.meas_rdict_geo(self.nuc_bin, cell.vor_roi_dict())
-
-    def create_intens_data(self) :
-        intens_dict = {}
-
-        for prj_method, prj_infos in self.exper.prj_method_dict().items() :
-            prj_imp = self.prj_imps()[prj_method]
-            # prj_imp.show()
+            for data_key in sheet_dict.keys() :
+                print(self.data(data_key))
 
 
-            for prj_info in prj_infos :
-                channel = prj_info[0]
-                roi_dict_name = prj_info[1]
+    # def create_roi_dicts(self) :
+    #     self._cell_roi_dict = {}
+    #     for cell in self.cells :
+    #         label = cell.get_id().replace(self.exper.name, '')
+    #         self._cell_roi_dict[label] = cell.roi
+    #
+    #     for cell in self.cells() :
+    #         for nuc in cell.nucs() :
+    #             label = nuc.get_short_id()
+    #
+    #             cell._nuc_roi_dict[label] = nuc.roi()
+    #             cell._vor_roi_dict[label] = nuc.vor_roi()
 
-                # roi_dict = self.get_roi_dict_by_name(roi_dict_name)
-                ## could change this later for more generality
-                # if roi_dict_name == "nucs"
+    # def create_geo_data(self) :
+    #     self._cell_geo_data = futils.meas_rdict_geo(self.nuc_bin, self.cell_roi_dict())
+    #
+    #     for cell in self.cells :
+    #         cell._vnuc_geo_data = futils.meas_rdict_geo(self.nuc_bin, cell.nuc_roi_dict())
+    #         cell._vor_geo_data = futils.meas_rdict_geo(self.nuc_bin, cell.vor_roi_dict())
+    #
+    # def create_intens_data(self) :
+    #     intens_dict = {}
+    #
+    #     for prj_method, prj_infos in self.exper.prj_method_dict().items() :
+    #         prj_imp = self.prj_imps()[prj_method]
+    #         # prj_imp.show()
+    #
+    #
+    #         for prj_info in prj_infos :
+    #             channel = prj_info[0]
+    #             roi_dict_name = prj_info[1]
+    #
+    #             # roi_dict = self.get_roi_dict_by_name(roi_dict_name)
+    #             ## could change this later for more generality
+    #             # if roi_dict_name == "nucs"
+    #
+    #
+    #             prj_imp.setC(channel)
+    #             prj_imp_name = '_'.join([self.exper.get_channel_name(channel), prj_method])
+    #             for cell in self.cells()
+    #                 cell.intens_data
+    #
+    #             intens_data = futils.roi_dict_intens(prj_imp, roi_dict)
+    #             intens_data_name = '_'.join([self.exper.get_channel_name(channel), roi_dict_name])
+    #
+    #             intens_dict[intens_data_name] = intens_data
+    #
 
 
-                prj_imp.setC(channel)
-                prj_imp_name = "_".join([self.exper.get_channel_name(channel), prj_method])
-                for cell in self.cells()
-                    cell.intens_data
+    # def create_prj_imps(self) :
+    #     # slices = self.exper.hseg_slices()[self.name]
+    #
+    #     self._prj_imps = {}
+    #
+    #     for prj_method in self.exper.prj_method_dict() :
+    #         prj_imp = futils.make_projection(self.raw_imp, prj_method, self.slices())
+    #
+    #         self._prj_imps[prj_method] = prj_imp
 
-                intens_data = futils.roi_dict_intens(prj_imp, roi_dict)
-                intens_data_name = '_'.join([self.exper.get_channel_name(channel), roi_dict_name])
-
-                intens_dict[intens_data_name] = intens_data
+    def create_prj_imp(self, prj_method) :
+        # slices = self.exper.hseg_slices()[self.name]
 
 
-    def create_prj_imps(self) :
-        slices = self.exper.hseg_slices()[self.name]
+        # for prj_method in self.exper.prj_method_dict() :
+        # print(prj_method)
+        # print(type(prj_method))
+        prj_imp = futils.make_projection(self.raw_stack(), prj_method, self.slices())
 
-        self._prj_imps = {}
+        self._prj_imps[prj_method] = prj_imp
 
-        for prj_method in self.exper.prj_method_dict() :
-            prj_imp = futils.make_projection(self.raw_imp, prj_method, slices)
-
-            self._prj_imps[prj_method] = prj_imp
-
+    def get_prj_imp_ch(self, prj_method, channel_id) :
+        # print(type(prj_method))
+        prj_imp = self.prj_imps(prj_method)
+        if type(channel_id) == str :
+            channel_num = self.exper.get_channel_num(channel_id)
+        else :
+            channel_num = channel_id
+        prj_imp.setC(channel_num)
+        return prj_imp
 
     ## </create properties>
+
+    # def create_data(self, roi_dict_name, param) :
+    #     if roi_dict_name == 'cell' :
+    #         roi_dict = self.cell_roi_dict()
+    #
+    #         if param[0] == "geo" :
+    #             imp = self.raw_stack()
+    #
+    #             data = futils.meas_rdict_geo(imp, roi_dict)
+    #         else :
+    #             imp.setC
+    #             data = futils.meas_rdict_intens(imp)
+    #     else :
+    #         if roi_dict_name == "nuc"
+    #             roi_dict =
+    #
+
 
 
     def get_roi_dict(self, roi_dict_name) :
@@ -322,6 +419,12 @@ class Hseg :
             imp = IJ.openImage(self.file_dict()[suf])
 
         return imp
+
+
+    # def make_prj_func(prj_method) :
+    #     return futils.make
+
+
 
 
 

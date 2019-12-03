@@ -41,9 +41,32 @@ class Exper :
 
     TEMP_OUT_DIR = 'temp_out_dir'
 
+    POSS_ROI_DICTS = {"cell" : "hseg", "nuc" : "cell", "vor" : "cell"}
 
 
 
+    def idk(self) :
+        from temp import ihe_dict
+
+        for sheet_dict in ihe_dict.values() :
+            for data_key in sheet_dict.keys() :
+                if type(data_key[1]) == str :
+                    data_key = (data_key[0], (data_key[1],))
+                try :
+                    data_src_level = Exper.POSS_ROI_DICTS[data_key[0]]
+                except :
+                    raise Exception('no roi_dict called {}'.format(roi_dict_name))
+
+                if data_src_level == "hseg" :
+                    for hseg in self.hsegs() :
+                        hseg.data(data_key)
+                else :
+                    try :
+                        for hseg in self.hsegs() :
+                            for cell in hseg.cells() :
+                                cell.data(data_key)
+                    except Exception as e :
+                        print(e)
 
     @staticmethod
     def setup() :
@@ -76,6 +99,10 @@ class Exper :
         dir_name = os.path.basename(self.path)
         name = dir_name.split('_')[:2]
         self.name = '_'.join(name)
+
+
+        self._data = {"cell":{}, "vor":{}, "nuc":{}}
+
 
     # def load_exper(self) :
 
@@ -156,12 +183,94 @@ class Exper :
             return self._calc_dict
 
 
-    def conv_headings() :
-        pass
+
+
+    #
+    # def get_data(self, roi_dict_name, param) :
+    #     # if param in self._data(roi_set_name)
+    #     try :
+    #         return self._data[roi_set_name][param]
+    #
+    #     except :
+    #         self.create_data(roi_set_name, param)
+    #         return self._data[roi_set_name][param]
+    #
+    #
+    #
+    # def create_data(self, roi_dict_name, param) :
+    #     for hseg in self.hsegs() :
+    #
+    #
+
+
+
+        # roi_func_dict = {
+        #     "cell" : Hseg.cell_roi_dict,
+        #     "nuc" : Cell.nuc_roi_dict}
+        #     "vor" : Cell.vor_roi_dict} }
+        #
+        # roi_func = self.roi_func_dict[roi_set]
+
+
+    #
+    # def idkyet(self, param) :
+    #     if type(param) == str :
+    #
+    #     else :
+    #
+    #
+
+
+
+
 
     ## </properties>
 
 ## <create properties>
+
+    # {
+    # def load_json_info(self) :
+    #     """
+    #     read json file with metadata and intialize relevant properties
+    #     creates channels, prj_method_dict, and hseg_slices
+    #     """
+    #     json_file_path = os.path.join(self.path, self.name + Exper.JSON_SUF)
+    #
+    #     if not os.path.exists(json_file_path) :
+    #         IJ.log('no experiment json file for experiment {}\npath:{}'.format(self.name, json_file_path))
+    #
+    #     else :
+    #         with open(json_file_path, 'r') as f :
+    #             raw_text = f.read()
+    #
+    #         ignore, json_text = raw_text.split(Exper.JSON_SPLIT_CHAR)
+    #         json_raw = json.loads(json_text)
+    #         self._hseg_slices = json_raw[Exper.JSON_KEY_SLICES]
+    #         self._calc_dict = json_raw[Exper.JSON_KEY_CALC]
+    #
+    #         channels_raw = json_raw[Exper.JSON_KEY_CHANNELS]
+    #         self._channels = {int(key): value for key, value in channels_raw.items()}
+    #
+    #         self._prj_method_dict = {}
+    #
+    #         for channel, info_list in self._channels.items() :
+    #             if info_list[1] == None :
+    #                 continue
+    #
+    #             channel_name = info_list[0]
+    #             print('info_list = {}'.format(info_list))
+    #             for pair in info_list[1:] :
+    #                 # print(pair)
+    #                 prj_method = pair[0]
+    #                 roi_set_name = pair[1]
+    #
+    #                 if prj_method not in self._prj_method_dict :
+    #                     self._prj_method_dict[prj_method] = [[channel, roi_set_name]]
+    #
+    #                 else :
+    #                     self._prj_method_dict[prj_method].append([channel, roi_set_name])
+    # }
+
 
     def load_json_info(self) :
         """
@@ -184,25 +293,26 @@ class Exper :
 
             channels_raw = json_raw[Exper.JSON_KEY_CHANNELS]
             self._channels = {int(key): value for key, value in channels_raw.items()}
+            self._ch_name_to_num = {value[0] : int(key) for key, value in channels_raw.items()}
 
-            self._prj_method_dict = {}
+            # self._prj_method_dict = {}
 
-            for channel, info_list in channels.items() :
-                if info_list[2] == None :
-                    continue
-
-                channel_name = info_list[1]
-                print("info_list = {}".format(info_list))
-                for pair in info_list[2:] :
-                    # print(pair)
-                    prj_method = pair[0]
-                    roi_set_name = pair[1]
-
-                    if prj_method not in prj_method_dict :
-                        self._prj_method_dict[prj_method] = [[channel, roi_set_name]]
-
-                    else :
-                        self._prj_method_dict[prj_method].append([channel, roi_set_name])
+            # for channel, info_list in self._channels.items() :
+            #     if info_list[1] == None :
+            #         continue
+            #
+            #     channel_name = info_list[0]
+            #     print('info_list = {}'.format(info_list))
+            #     for pair in info_list[1:] :
+            #         # print(pair)
+            #         prj_method = pair[0]
+            #         roi_set_name = pair[1]
+            #
+            #         if prj_method not in self._prj_method_dict :
+            #             self._prj_method_dict[prj_method] = [[channel, roi_set_name]]
+            #
+            #         else :
+            #             self._prj_method_dict[prj_method].append([channel, roi_set_name])
 
     def create_hsegs(self) :
         """find hseg directories and initialize hseg"""
@@ -220,7 +330,7 @@ class Exper :
                         self._hsegs.append(Hseg(self, file_name))
                         self._hseg_dict[self._hsegs[-1]] = len(self._hsegs) - 1
                     except Exception as e :
-                        print("exception trying to init hseg {}: {}".format(file_name, e))
+                        print('exception trying to init hseg {}: {}'.format(file_name, e))
 
     ## </create properties>
 
@@ -236,7 +346,8 @@ class Exper :
     def get_channel_name(self, channel_num) :
         return self.channels[channel_num][0]
 
-
+    def get_channel_num(self, channel_name) :
+        return self._ch_name_to_num[channel_name]
 
 
 ## <to_string functions>

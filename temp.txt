@@ -1,0 +1,13 @@
+hseg
+    prj_imp (prj_method)
+        if prj_method in _prj_imp_dict :
+            return _prj_imp_dict[prj_method]
+
+        else :
+            _prj_imp_dict = create_prj_imp(prj_method)
+            return _prj_imp_dict[prj_method]
+
+    prj_imp_channel(prj_method, channel)
+        imp = prj_imp(prj_method)
+        imp.setC(channel)
+        return imp
