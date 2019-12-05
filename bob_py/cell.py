@@ -24,12 +24,7 @@ class Cell :
         self._nuc_dict = {}
 
         self._roi_dicts = {}
-        # self._nuc_roi_dict = None
-        # self._vor_roi_dict = None
-        # self._nuc_geo_data = None
-        # self._vor_geo_data = None
 
-        # self._nuc_intens_data = {}
         self._data = {}
 
 ## <properties>
@@ -62,21 +57,9 @@ class Cell :
         try :
             return self._roi_dicts[roi_dict_name]
         except :
-            self.create_roi_dict(roi_dict_name)
+            self.create_roi_dicts(roi_dict_name)
             return self._roi_dicts[roi_dict_name]
 
-    def create_roi_dict(self, roi_dict_name) :
-        self._roi_dicts[roi_dict_name] = {}
-        if roi_dict_name == "nuc" :
-            for nuc in self.nucs() :
-                label = nuc.get_short_id()
-
-                self._roi_dicts[roi_dict_name][label] = nuc.roi()
-        elif roi_dict_name == "vor" :
-            for nuc in self.nucs() :
-                label = nuc.get_short_id()
-
-                self._roi_dicts[roi_dict_name][label] = nuc.vor_roi()
 
 
     def data(self, data_key) :
@@ -86,62 +69,9 @@ class Cell :
             self.create_data(data_key)
             return self._data[data_key]
 
-    def create_data(self, data_key) :
-        roi_dict_name = data_key[0]
-        roi_dict = self.roi_dicts(roi_dict_name)
-        # print(roi_dict)
-        imp_info = data_key[1]
-
-        if imp_info[0] == "geo" :
-            new_data = futils.meas_rdict_geo(self.hseg.raw_stack(), roi_dict)
-            self._data[data_key] = new_data
-
-        elif imp_info[0] == "intens" :
-            # print('cell:create_data: imp_info = {}'.format(imp_info))
-            imp = self.hseg.get_prj_imp_ch(*imp_info[1:])
-            new_data = futils.meas_rdict_intens(imp, roi_dict)
-            self._data[data_key] = new_data
 
 
-        else :
-            raise('crap')
 
-
-    def nuc_roi_dict(self) :
-        if self._nuc_roi_dict != None :
-            return self._nuc_roi_dict
-        else :
-            self.hseg.create_roi_dicts()
-            return self._nuc_roi_dict
-
-    def vor_roi_dict(self) :
-        if self._vor_roi_dict != None :
-            return self._vor_roi_dict
-        else :
-            self.hseg.create_roi_dicts()
-            return self._vor_roi_dict
-
-    def nuc_geo_data(self) :
-        if self._nuc_geo_data != None :
-            return self._nuc_geo_data
-        else :
-            self.hseg.create_geo_data()
-            return self._nuc_geo_data
-
-    def vor_geo_data(self) :
-        if self._vor_geo_data != None :
-            return self._vor_geo_data
-        else :
-            self.hseg.create_geo_data()
-            return self._vor_geo_data
-
-
-    def nuc_intens_data(self) :
-        if len(self._nuc_intens_data) > 0 :
-            return self._nuc_intens_data
-        else :
-            self.hseg.create_intens_data()
-            return self._nuc_intens_data
 
 
 
@@ -173,7 +103,6 @@ class Cell :
         """
         runs voronoi on cell to create vor_rois
         """
-        # print('creating_vor_roi')
         rm = RoiManager.getRoiManager()
         rm.reset()
         d = Duplicator()
@@ -185,12 +114,10 @@ class Cell :
         IJ.run(nuc_bin_copy, "Clear Outside", "")
 
         IJ.run(nuc_bin_copy, "Voronoi", "")
-        # len()
         nuc_bin_copy.setRoi(None)
         ip = nuc_bin_copy.getProcessor()
         ip.setMinAndMax(0,1)
         IJ.run(nuc_bin_copy, "Apply LUT", "")
-        # IJ.run(nuc_bin_copy, "Invert", "")
 
         nuc_bin_copy.setRoi(self.roi())
         IJ.run(nuc_bin_copy, "Analyze Particles...", "add")
@@ -199,7 +126,6 @@ class Cell :
         futils.force_close(nuc_bin_copy)
 
         return vor_rois
-        # self.match_vor_nuc(vor_rois)
 
 
     def match_vor_nuc(self, vor_rois) :
@@ -210,50 +136,115 @@ class Cell :
             currently having issues/not working
         """
         # if IJ.escapePressed() : IJ.exit()
+        ## did this work?
 
-        # print('match_vor_nuc')
         rm = RoiManager.getRoiManager()
         nuc_inds = [x for x in range(len(self.nucs()))]
-        # print(nuc_inds)
         for vor_roi in vor_rois :
-            # print(vor_roi)
-            # print(nuc_inds)
+
 
             temp = None
             for i, nuc_ind in enumerate(nuc_inds) :
                 nuc_roi = self.nucs()[nuc_ind].roi()
-                # print('\t{}'.format(nuc_roi))
 
                 nuc_cent = futils.roi_cent(nuc_roi, integer=True)
 
                 if vor_roi.contains(*nuc_cent) :
-                    # print("huh")
                     self.nucs()[nuc_ind]._vor_roi = vor_roi
-                    ## I don't think I need to do this, I could just use i outside of loop but it feels so insecure or something
+
                     temp = i
                     break
 
             else :
-                IJ.log('self: {}, issue with voronoi nuc match up'.format(self.name))
-                rm.reset()
-                for i, nuc in enumerate(self.nucs()) :
-
-                    x = int(nuc.roi.getXBase())
-                    y = int(nuc.roi.getYBase())
-                    IJ.log('{}. ({},{})'.format(i,x,y))
-                    futils.add_roi(Roi(x,y,10,10), str(i))
-                IJ.log(str(nuc_inds))
-                futils.add_roi(vor_roi, 'vor_roi')
+                # IJ.log('self: {}, issue with voronoi nuc match up'.format(self.name))
+                # rm.reset()
+                # for i, nuc in enumerate(self.nucs()) :
+                #
+                #     x = int(nuc.roi.getXBase())
+                #     y = int(nuc.roi.getYBase())
+                #     IJ.log('{}. ({},{})'.format(i,x,y))
+                #     futils.add_roi(Roi(x,y,10,10), str(i))
+                # IJ.log(str(nuc_inds))
+                # futils.add_roi(vor_roi, 'vor_roi')
 
                 ## raise RuntimeError('self: {}, issue with voronoi nuc match up'.format(self.name))
+                raise BobException('issue matching voronoi and nuc')
 
             if temp is not None :
                 del nuc_inds[temp]
 
+    def create_roi_dicts(self, roi_dict_name) :
+        self._roi_dicts[roi_dict_name] = {}
+        if roi_dict_name == "nuc" :
+            for nuc in self.nucs() :
+                # label = nuc.get_short_id()
+                label = nuc.name
+
+                self._roi_dicts[roi_dict_name][label] = nuc.roi()
+        elif roi_dict_name == "vor" :
+            for nuc in self.nucs() :
+                # label = nuc.get_short_id()
+                label = 'v{}'.format(nuc.id_num)
+                self._roi_dicts[roi_dict_name][label] = nuc.vor_roi()
+
+
+    def create_data(self, data_key) :
+        roi_dict_name = data_key[0]
+        roi_dict = self.roi_dicts(roi_dict_name)
+
+        imp_info = data_key[1]
+
+        if (type(imp_info) == str and imp_info == "geo") or imp_info[0] == "geo" :
+            nuc_rt_data = futils.meas_rdict_geo(self.hseg.raw_stack(), roi_dict)
+            new_data = self.process_nuc_rt_data(nuc_rt_data)
+            self._data[data_key] = new_data
+
+        elif imp_info[0] == "intens" :
+            imp = self.hseg.get_prj_imp_ch(*imp_info[1:])
+            nuc_rt_data = futils.meas_rdict_intens(imp, roi_dict)
+            new_data = self.process_nuc_rt_data(nuc_rt_data)
+            self._data[data_key] = new_data
+
+
+        else :
+            raise BobException("cell.create_data: ?")
+
+
+    def process_nuc_rt_data(self, nuc_rt_data) :
+        new_data = {}
+
+
+        for i in range(len(nuc_rt_data["Label"])) :
+            roi_name = futils.results_label_to_roi_label(nuc_rt_data["Label"][i])
+            # if roi_name not in self.cell_dict() :
+                # raise BobException("hseg.process_cell_rt_data: roi_name should match the name of one of the cells")
+            nuc_key = (self.hseg.name, self.name, roi_name) ## todo: parse_name function to replace self.name with (larva, side, seg))
+            new_data[nuc_key] = {}
+            for msr_param in nuc_rt_data.keys() :
+                if msr_param == "Label" :
+                    continue
+                else :
+                    new_data[nuc_key][msr_param] = nuc_rt_data[msr_param][i]
+        return new_data
 
 
 
     ## </create properties>
+
+
+## <other>
+    # def get_nuc(ind_key) :
+    #     if type(ind_key) == int :
+    #         return self.hsegs()[ind_key]
+    #     elif type(ind_key) == str :
+    #         return self.hsegs()[self.hsegs_dict()[ind_key]]
+    #     else :
+    #         raise(BobException("exper.get_hseg - ind_key must be an int or string"))
+
+
+
+
+    ##</other>
 
 
 

@@ -41,8 +41,17 @@ c = h.cells()[0]
 n = c.nucs()[0]
 
 
-h.ihe()
+#h.ihe()
+#exp.dev_create_default_data()
+#print(exp.aggr_data())
+print(exp.aggr_data()["nuc_sheet"][("nuc", "geo")].keys())
+#exp.create_rearranged_data()
+#exp.dev_save()
+#futils.jpprint(h._data.items())
 
+
+#for h in exp.hsegs() :
+#	h.data(("cell",("geo")))
 
 br.ptoc(t)
 
