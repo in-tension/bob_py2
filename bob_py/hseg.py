@@ -11,8 +11,10 @@ abbr.
 """
 
 
+
 import os
 import re
+import copy
 
 
 from ij import IJ, WindowManager
@@ -26,8 +28,8 @@ import brutils as br
 import fiji_utils as futils
 
 from .cell import Cell
-
-
+from .bob_exception import BobException
+from .bob_hding import BobHding
 
 
 class Hseg :
@@ -35,17 +37,32 @@ class Hseg :
     RAW_SUF = '.tif'
     NUC_BIN_SUF = '_Nuc-bin.tif'
 
-    JSON_SUF = '.json'              ## why is this here and not in exper?
-    JSON_SPLIT_CHAR = 'json:'       ## why is this here and not in exper?
-
     CELL_SUF_REGEX = '_XY-([^\.]*).csv'
     CELL_SUF_PATTERN = re.compile(CELL_SUF_REGEX)
 
-    CELL_ROI_DICT_NAME = "cells"
-    NUC_ROI_DICT_NAME = "nucs"
-    VOR_ROI_DICT_NAME = "vors"
+
+# { <static_and_class_methods>
+    @staticmethod
+    def parse_rt_label(label) :
+        temp = label.split(':')[1]
+        if not temp.startswith('L') :
+            raise BobException('issue processing results table Label name')
+
+        parts = temp.split('_')
+
+        if len(parts) == 2 :
+            new_label = (parts[0], parts[1])
+            cell_name = temp
+
+        else :
+            idk = parts[2].split('-')
+            new_label = (parts[0], parts[1], int(idk[1]))
+            cell_name = '_'.join([parts[0], parts[1]])
+
+        return new_label, cell_name
 
 
+    # } </static_and_class_methods>
 
 
     def __init__(self, exper, dir_name) :
@@ -53,117 +70,40 @@ class Hseg :
         self.name = dir_name.replace(self.exper.name+'_', '')
         self.path = os.path.join(self.exper.path, dir_name)
 
+        self.inactive = False
+
+        self._prj_imps = {}
+        self._roi_dicts = {}
 
 
-## <properties>
+# { <dev>
+
+
+
+    # } </dev>
+
+# { <properties>
+
+    @br.lazy_eval
     def file_dict(self) :
         """
             `property`
             keys -> file_suf
             vals -> file_path
         """
-        try :
-            return self._file_dict
-        except :
-            self.make_file_dicts()
-            return self._file_dict
+        self.create_file_dicts()
 
+    @br.lazy_eval
     def cell_file_dict(self) :
         """
             `property`
             just cell rois
             keys -> cell_name (not the actually file_suf)
             vals -> file_path
-            """
-        try :
-            return self._cell_file_dict
-        except :
-            self.make_file_dicts()
-            return self._cell_file_dict
-
-
-    def raw_stack(self) :
-        try :
-            return self._raw_stack
-        except :
-            self.open_raw_stack()
-            return self._raw_stack
-
-    def cal(self) :
-        try :
-            return self._cal
-        except :
-            self.open_raw_stack()
-            return self._cal
-
-    def nuc_bin(self) :
-        try :
-            return self._nuc_bin
-        except :
-            self._nuc_bin = self.open_hseg_imp(Hseg.NUC_BIN_SUF)
-            return self._nuc_bin
-
-
-    def cells(self) :
-        try :
-            return self._cells
-        except :
-            self.create_cells()
-            return self._cells
-
-
-    def roi_dicts(self) :
         """
-        _roi_dicts {
-            "Cell" : { "cell_id":cell_roi },
-            "Vor" : { "vor_id":vor_roi },
-            "Nuc" : { "nuc_id":nuc_roi },
-        }
-        use caps for keys or not?
+        self.create_file_dicts()
 
-        currently those 3 roi_sets are hard coded in,
-        but it should be possible to make it more general
-        """
-        try :
-            return self._roi_dicts
-        except :
-            self.create_roi_dicts()
-            return self._roi_dicts
-
-    def cell_roi_dict(self) :
-        """
-        dict { name(str) = roi }
-        roi_dicts can be used with fiji_utils/futils' measure_roi_dict, meas_rdict_geo, meas_rdict_intens
-        """
-        try :
-            return self._cell_roi_dict
-        except :
-            self.create_roi_dicts()
-            return self._cell_roi_dict
-
-    def cell_geo_data(self) :
-        try :
-            return self._cell_geo_data
-        except :
-            self.create_geo_data()
-            return self._cell_geo_data
-
-
-    def prj_imps(self) :
-        try :
-            return self._prj_imps
-        except :
-            self.create_prj_imps()
-            return self._prj_imps
-
-
-
-    ## </properties>
-
-## <create properties>
-
-
-    def make_file_dicts(self) :     ## change to create?
+    def create_file_dicts(self) :
         """
             makes
             - _file_dict
@@ -174,7 +114,6 @@ class Hseg :
         files = os.listdir(self.path)
         for file_name in files :
             if file_name.startswith(self.get_id()) :
-                # suf = file_name.replace(self.get_id(), '', 1)
                 suf = file_name.replace(self.get_id(), '')
                 file_path = os.path.join(self.path, file_name)
 
@@ -185,38 +124,88 @@ class Hseg :
                 else :
                     self._file_dict[suf] = file_path
 
+    @br.lazy_eval
+    def slices(self) :
+        self._slices = self.exper.hseg_slices()[self.name]
 
-    def open_raw_stack(self) :
-        """
-            creates
-            - _raw_stack
-            - _cal
-        """
+    @br.lazy_eval
+    def raw_stack(self) :
         self._raw_stack = self.open_hseg_imp(Hseg.RAW_SUF)
-        self._cal = self._raw_stack.getCalibration()
 
-    def create_cells(self) :
+    @br.lazy_eval
+    def cal(self) :
+        self._cal = self.raw_stack().getCalibration()
+
+    @br.lazy_eval
+    def nuc_bin(self) :
+        self._nuc_bin = self.open_hseg_imp(Hseg.NUC_BIN_SUF)
+
+    def open_hseg_imp(self, suf) :
+        """open imp which starts with <hseg.get_id()>_<suf>"""
+        if suf not in self.file_dict() :
+            imp = None
+            IJ.log('hemisegment {} does not have raw tif file {}'.format(self.name, self.name + suf))
+            ## raise Exception('hemisegment {} does not have raw tif file {}'.format(self.name, self.name + suf))
+
+        else :
+            imp = IJ.openImage(self.file_dict()[suf])
+
+        return imp
+
+
+    @br.lazy_eval
+    def cells(self) :
         """create cells from cell rois"""
+        if len(self.cell_file_dict()) == 0 :
+            self.exper.deactivate_hseg(self.name, 'no cell coordinate files found')
+
         self._cells = []
-        self._cell_dict = {}
         for cell_name, cell_path in self.cell_file_dict().items() :
             self._cells.append(Cell(self, cell_name, cell_path))
-            self._cell_dict[cell_name] = len(self._cells) - 1
 
 
+    @br.lazy_eval_dict
+    def prj_imps(self, prj_method) :
+        prj_imp = futils.make_projection(self.raw_stack(), prj_method, self.slices())
 
+        self._prj_imps[prj_method] = prj_imp
+
+
+    @br.lazy_eval_dict
+    def roi_dicts(self, roi_dict_name) :
+        self._roi_dicts[roi_dict_name] = {}
+        ## should I put if statements within for loop, or repeat for loop in each if statement?
+        for cell in self.cells() :
+
+            if roi_dict_name == "Cell" :
+                label = cell.get_short_id()
+                self._roi_dicts[roi_dict_name][label] = cell.roi()
+
+            elif roi_dict_name == "Nuc" :
+
+                for nuc in cell.nucs() :
+                    label = nuc.get_short_id()
+                    self._roi_dicts[roi_dict_name][label] = nuc.roi()
+
+            elif roi_dict_name == "Vor" :
+                for nuc in cell.nucs() :
+                    label = nuc.get_short_id_vor()
+                    self._roi_dicts[roi_dict_name][label] = nuc.vor_roi()
+
+            else :
+                raise Exception('no roi_dict in hseg called {}'.format(roi_dict_name))
+
+    ## creates nucs in cell class
     def create_nucs(self) :
         """ """
+        for cell in self.cells() :
+            cell._nucs = []
+
         rm = RoiManager.getRoiManager()
         rm.reset()
 
-        # if UPDATE1 :
         IJ.run(self.nuc_bin(), "Invert", "")
-        # self.nuc_bin().show()
-        # len()
-        # from ij.gui import WaitForUserDialog
-        # wfug = WaitForUserDialog('butts')
-        # wfug.show()
+
 
         rt = ResultsTable.getResultsTable()
         rt.reset()
@@ -224,9 +213,7 @@ class Hseg :
 
         rois = rm.getRoisAsArray()
         IJ.run(self.nuc_bin(),"Remove Overlay", "");
-        # self.nuc_bin().deleteRoi()
-        # self.nuc_bin().show()
-        # len()
+
 
 
         problem_nucs = []
@@ -243,89 +230,115 @@ class Hseg :
             if not found_cell :
                 IJ.log('Nuc not in any cell for hemisegment {}'.format(self.name))
                 problem_nucs.append(roi)
-        # print(self.cells['vl3'].nucs)
         return problem_nucs
 
-    def create_roi_dicts(self) :
-        self._cell_roi_dict = {}
-        for cell in self.cells :
-            label = cell.get_id().replace(self.exper.name, '')
-            self._cell_roi_dict[label] = cell.roi
+    # } </properties>
 
+# { <general>
+
+    def get_cell(self, ind_key) :
+        if type(ind_key) == int :
+            return self.cells()[ind_key]
+        elif type(ind_key) == str or type(ind_key) == unicode :
+            if ind_key.startswith(self.name) :
+                ind_key = ind_key.replace(self.name + '_','')
+            return self.get_cell_dict()[ind_key]
+        else :
+            raise(BobException("hseg.get_cell - ind_key ({}) is {}, it must be an int or string".format(ind_key, type(ind_key))))
+
+    def get_cell_dict(self) :
+        cell_dict = {}
         for cell in self.cells() :
-            for nuc in cell.nucs() :
-                label = nuc.get_short_id()
+            cell_dict[cell.name] = cell
 
-                cell._nuc_roi_dict[label] = nuc.roi()
-                cell._vor_roi_dict[label] = nuc.vor_roi()
+        return cell_dict
 
-    def create_geo_data(self) :
-        self._cell_geo_data = futils.meas_rdict_geo(self.nuc_bin, self.cell_roi_dict())
+    def get_prj_imp_ch(self, channel_def) :
+        prj_imp = self.prj_imps(channel_def.prj_method)
 
-        for cell in self.cells :
-            cell._vnuc_geo_data = futils.meas_rdict_geo(self.nuc_bin, cell.nuc_roi_dict())
-            cell._vor_geo_data = futils.meas_rdict_geo(self.nuc_bin, cell.vor_roi_dict())
+        prj_imp.setC(channel_def.num)
+        return prj_imp
 
-    def create_intens_data(self) :
-        intens_dict = {}
+    # } </general>
 
-        for prj_method, prj_infos in self.exper.prj_method_dict().items() :
-            prj_imp = self.prj_imps()[prj_method]
-            # prj_imp.show()
+# { <processing:make_data>
 
+    def make_data(self) :
+        for cell in self.cells() :
+            cell.init_data_attrs()
+            ## these are initialized here so that when other cell functions are called
+            ## they can get these attrs using their functions instead the variables
 
-            for prj_info in prj_infos :
-                channel = prj_info[0]
-                roi_dict_name = prj_info[1]
+        self.make_raw_data()
+        self.make_summary_data()
 
-                # roi_dict = self.get_roi_dict_by_name(roi_dict_name)
-                ## could change this later for more generality
-                # if roi_dict_name == "nucs"
+    def make_raw_data(self) :
+        to_msr = self.exper.to_msr()
 
-
-                prj_imp.setC(channel)
-                prj_imp_name = "_".join([self.exper.get_channel_name(channel), prj_method])
-                for cell in self.cells()
-                    cell.intens_data
-
-                intens_data = futils.roi_dict_intens(prj_imp, roi_dict)
-                intens_data_name = '_'.join([self.exper.get_channel_name(channel), roi_dict_name])
-
-                intens_dict[intens_data_name] = intens_data
+        for hding in to_msr :
 
 
-    def create_prj_imps(self) :
-        slices = self.exper.hseg_slices()[self.name]
+            roi_dict = self.roi_dicts(hding.roi_set)
+            if len(roi_dict) == 0 : self.log('roi_dict empty')
+            if hding.is_geo() :
 
-        self._prj_imps = {}
+                imp = self.raw_stack()
+                meas_int = futils.MEAS_GEO
 
-        for prj_method in self.exper.prj_method_dict() :
-            prj_imp = futils.make_projection(self.raw_imp, prj_method, slices)
+            else :
 
-            self._prj_imps[prj_method] = prj_imp
+                imp = self.get_prj_imp_ch(hding.channel_def)
+                meas_int = futils.MEAS_INTENS_XY
+
+            rt_dict = futils.measure_roi_dict(imp, roi_dict, set_measure=meas_int)
 
 
-    ## </create properties>
+            self.rt_data_to_cells(rt_dict, hding)
+
+    def make_summary_data(self) :
+        to_summarize = self.exper.to_summarize()
+
+        for hding in to_summarize :
+            for cell in self.cells() :
+                cell.calc_summary_data(hding)
+
+    def rt_data_to_cells(self, rt_dict, hding_subpart) :
+
+        row_labels = rt_dict.pop('Label')
+        hdings = []
+        for msr_param in rt_dict.keys() :
+            new_hding = copy.copy(hding_subpart)
+            new_hding.set_msr_param(msr_param)
+            hdings.append(new_hding)
+        cols = [col for col in rt_dict.values()]
 
 
-    def get_roi_dict(self, roi_dict_name) :
-        return self.roi_dicts()[roi_dict_name]
+        rows = br.rotate(cols)
 
-    def open_hseg_imp(self, suf) :
-        """open imp which starts with <hseg.get_id()>_<suf>"""
-        if suf not in self.file_dict() :
-            imp = None
-            IJ.log('hemisegment {} does not have raw tif file {}'.format(self.name, self.name + suf))
-            ## raise Exception('hemisegment {} does not have raw tif file {}'.format(self.name, self.name + suf))
+        if hding_subpart.is_cell_sheet() :
+            for i in range(len(rows)) :
+                new_label, cell_name = Hseg.parse_rt_label(row_labels[i])
+                self.get_cell(cell_name).add_to_cell_data(hdings, rows[i])
 
         else :
-            imp = IJ.openImage(self.file_dict()[suf])
+            cell_rows = {}
+            for i in range(len(rows)) :
+                new_label, cell_name = Hseg.parse_rt_label(row_labels[i])
 
-        return imp
+                if cell_name in cell_rows :
+                    cell_rows[cell_name][new_label] = rows[i]
+                else :
+                    cell_rows[cell_name] = {new_label: rows[i]}
 
+            for cell_name, rows in cell_rows.items() :
+                self.get_cell(cell_name).add_to_nuc_data(hdings, rows)
 
+    # } </processing:make_data>
 
-## <to_string functions>
+# { <to_string functions>
+
+    def log(self, message) :
+        print(self.get_short_id() + ': ' + message)
 
     def get_prefix(self) :
         """For logging: prints name tabbed out appropriately"""
@@ -353,4 +366,4 @@ class Hseg :
     def __repr__(self) :
         return self.get_id()
 
-    ## </to_string functions>
+    # } </to_string functions>

@@ -1,0 +1,6 @@
+@import 'css/theme.css';       /* for the Read the Docs theme */
+@import 'pygments.css';       /* for the Read the Docs theme */
+
+p {
+    white-space: pre-wrap;
+}

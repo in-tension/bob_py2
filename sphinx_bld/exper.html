@@ -1,0 +1,309 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Exper &mdash; bob_py  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Hseg" href="hseg.html" />
+    <link rel="prev" title="bob_py" href="index.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> bob_py
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Exper</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hseg.html">Hseg</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cell.html">Cell</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nuc.html">Nuc</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bob_hding.html">BobHding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="exceptions.html">Exceptions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="exceptions.html#hsegdeactivated">HsegDeactivated</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">bob_py</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Exper</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/exper.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="exper">
+<h1>Exper<a class="headerlink" href="#exper" title="Permalink to this headline">¶</a></h1>
+<p>Root container for a bob_py experiment</p>
+<dl class="class">
+<dt id="bob_py.Exper">
+<em class="property">class </em><code class="sig-name descname">Exper</code><span class="sig-paren">(</span><em class="sig-param">path</em><span class="sig-paren">)</span><a class="headerlink" href="#bob_py.Exper" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="attribute">
+<dt id="bob_py.Exper.msg">
+<code class="sig-name descname">msg</code><a class="headerlink" href="#bob_py.Exper.msg" title="Permalink to this definition">¶</a></dt>
+<dd><p>Human readable string describing the exception.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bob_py.Exper.code">
+<code class="sig-name descname">code</code><a class="headerlink" href="#bob_py.Exper.code" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exception error code.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bob_py.Exper.PRINT_PROGRESS">
+<code class="sig-name descname">PRINT_PROGRESS</code><em class="property"> = True</em><a class="headerlink" href="#bob_py.Exper.PRINT_PROGRESS" title="Permalink to this definition">¶</a></dt>
+<dd><p>print progress</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bob_py.Exper.META_SUF">
+<code class="sig-name descname">META_SUF</code><em class="property"> = '.py'</em><a class="headerlink" href="#bob_py.Exper.META_SUF" title="Permalink to this definition">¶</a></dt>
+<dd><p>suffix of the meta data file
+prefix should be the Exper.name</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bob_py.Exper.setup">
+<em class="property">static </em><code class="sig-name descname">setup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#bob_py.Exper.setup" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bob_py.Exper.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">path</em><span class="sig-paren">)</span><a class="headerlink" href="#bob_py.Exper.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>msg</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Human readable string describing the exception.</p></li>
+<li><p><strong>code</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code></a>, optional) – Error code.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="bob_py.Exper.create_hsegs">
+<code class="sig-name descname">create_hsegs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#bob_py.Exper.create_hsegs" title="Permalink to this definition">¶</a></dt>
+<dd><p>given folders in self.path, initialize self.hsegs() and self.inactive_hseg_dict()</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bob_py.Exper.output_all_cols">
+<code class="sig-name descname">output_all_cols</code><span class="sig-paren">(</span><em class="sig-param">cell_sheet</em>, <em class="sig-param">nuc_sheet</em><span class="sig-paren">)</span><a class="headerlink" href="#bob_py.Exper.output_all_cols" title="Permalink to this definition">¶</a></dt>
+<dd><p>it is assumed that each sheet already has col hdings, and just needs data to be appended</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bob_py.Exper.get_prefix">
+<code class="sig-name descname">get_prefix</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#bob_py.Exper.get_prefix" title="Permalink to this definition">¶</a></dt>
+<dd><p>For logging: prints name tabbed out appropriately</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bob_py.Exper.get_id">
+<code class="sig-name descname">get_id</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#bob_py.Exper.get_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>id = &lt;exper.name&gt;[_&lt;hseg.name&gt;[_&lt;cell.name&gt;[_&lt;nuc.name&gt;]]]
+created by recursively calling parent.get_id()
+ends the recursive calls by return self.name</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="hseg.html" class="btn btn-neutral float-right" title="Hseg" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral" title="bob_py" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright .
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="_static/language_data.js"></script>
+
+  
+
+  <script type="text/javascript" src="_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

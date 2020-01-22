@@ -31,7 +31,7 @@ cell_conv_hdings = [
 
 
 nuc_conv_hdings = {
-    "geo": [
+    "Geo": [
         "Area",
         "Norm_Area",
         "X",
@@ -67,7 +67,7 @@ nuc_conv_hdings = {
         "AreaFrac",
         "Area"
     ],
-    "vor": [        ## in the order do you want voronoi
+    "Vor": [        ## in the order do you want voronoi
         "Area",
         "Norm_Area",
         "Perim",

@@ -1,0 +1,25 @@
+
+AttributeError
+	Raised when an attribute reference (see Attribute references) or assignment fails. (When an object does not support attribute references or attribute assignments at all, TypeError is raised.)
+
+LookupError
+	IndexError
+		Raised when a sequence subscript is out of range. (Slice indices are silently truncated to fall in the allowed range; if an index is not an integer, TypeError is raised.)
+	KeyError
+		Raised when a mapping (dictionary) key is not found in the set of existing keys.
+
+
+RuntimeError
+	Raised when an error is detected that doesn’t fall in any of the other categories. The associated value is a string indicating what precisely went wrong.
+
+
+TypeError
+	Raised when an operation or function is applied to an object of inappropriate type. The associated value is a string giving details about the type mismatch.
+
+	This exception may be raised by user code to indicate that an attempted operation on an object is not supported, and is not meant to be. If an object is meant to support a given operation but has not yet provided an implementation, NotImplementedError is the proper exception to raise.
+
+	Passing arguments of the wrong type (e.g. passing a list when an int is expected) should result in a TypeError, but passing arguments with the wrong value (e.g. a number outside expected boundaries) should result in a ValueError.
+
+
+ValueError
+	Raised when an operation or function receives an argument that has the right type but an inappropriate value, and the situation is not described by a more precise exception such as IndexError.
