@@ -5,10 +5,11 @@ import os
 
 package_path = cwd = '/Users/baylieslab/Documents/Amelia/code_dev/projects/bob_py/bob_idk/bob_py'
 
-files_to_use = ['exper.py', 'hseg.py', 'cell.py', "Nuc".py']
+# files_to_use = ['exper.py', 'hseg.py', 'cell.py', 'nuc.py']
+files_to_use = ['exper.py', 'hseg.py', 'cell.py']
 
 # groups_to_exclude = ['to_string functions']
-groups_to_exclude = ['to_string functions', 'dev']
+groups_to_exclude = ['to_string functions', 'dev', 'general']
 
 
 class_name_pat = re.compile('class (\w*) \:')

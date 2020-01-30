@@ -1,5 +1,0 @@
-for measuring the data, you could measure at the hseg level and use rois from both cells
-which would only be one fiji call which might be more efficient
-but you would then have to sort the output back into it's 2 cells
-
-instead I'm going to measure at the cell level, if efficiency becomes a problem, this is something to consider

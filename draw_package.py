@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-
+import brutils as br
 
 import drawSvg as draw
 import os
@@ -139,6 +139,9 @@ def draw_class(d, class_name, class_struct_dict, start_y, drawing_width) :
 
     top_cy = start_y -(PADDING + yr)
 
+    br.dprint(len(class_struct_dict), 'len(class_struct_dict)')
+    br.dprint(len(col_xs), 'len(col_xs)')
+
     for i in range(len(class_struct_dict)) :
         d.append(draw.Lines(cx2, top_cy, col_xs[i],
                             top_cy - (OVAL_HEIGHT/2 + 2*PADDING),
@@ -191,7 +194,7 @@ def draw_class(d, class_name, class_struct_dict, start_y, drawing_width) :
 
 def draw_package(package_dict) :
     DRAWING_WIDTH = 800
-    DRAWING_HEIGHT = 250*len(package_dict)
+    DRAWING_HEIGHT = 500*len(package_dict)
 
     origin =(-DRAWING_WIDTH/2, -DRAWING_HEIGHT)
 
@@ -210,8 +213,13 @@ def draw_package(package_dict) :
 
 
 # from butts import bob_package_dict
-from make_package_struct_dict import package_dict as bob_py_package_dict
+# from make_package_struct_dict import package_dict as bob_py_package_dict
+import make_package_struct_dict as mpsd
+import imp
+imp.reload(mpsd)
+bob_py_package_dict = mpsd.package_dict
+print(bob_py_package_dict)
 
 d = draw_package(bob_py_package_dict)
-cwd = '/Users/baylieslab/Documents/Amelia/code_dev/projects/bob_py/bob_idk'
-d.saveSvg(os.path.join(cwd,'example.svg'))
+# cwd = '/Users/baylieslab/Documents/Amelia/code_dev/projects/bob_py/bob_idk'
+d.saveSvg(os.path.join('.','example.svg'))

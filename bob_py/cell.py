@@ -14,7 +14,7 @@ import fiji_utils as futils
 import brutils as br
 
 from .nuc import Nuc
-from .bob_exception import BobException
+from .bob_exceptions import BobException
 from .bob_hding import BobHding
 
 class Cell :

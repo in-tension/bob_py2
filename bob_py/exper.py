@@ -40,7 +40,7 @@ import fiji_utils as futils
 import brutils as br
 
 from .hseg import Hseg
-from .bob_exception import BobException, HsegDeactivated
+from .bob_exceptions import BobException, HsegDeactivated
 from .bob_hding import BobHding, BobChannelDef
 from .default_output_hdings import default_cell_output_hdings, default_nuc_output_hdings
 
@@ -91,6 +91,17 @@ class Exper :
             rm.reset()
             rm.show()
 
+
+    def user_init(self, path) :
+        exper = Exper(path)
+
+        meta_path = exper.meta_data_path()
+
+        if not os.path.exists(meta_path) :
+            pass
+
+
+
     # } </static_and_class_methods>
 
 
@@ -101,6 +112,8 @@ class Exper :
             code (:obj:`int`, optional): Error code.
         """
 
+        if path.endswith(os.sep) :
+            path = path[:-1]
         self.path = path
 
 
@@ -108,16 +121,79 @@ class Exper :
         dir_name = os.path.basename(self.path)
         name = dir_name.split('_')[:2]
         self.name = '_'.join(name)
+        """name is the first two terms of experiment directory name, where terms are split by '_'"""
 
 
-        # ## remove
-        # self._data = {"Cell":{}, "Vor":{}, "Nuc":{}}
 
 
 # { <dev>
 
+    # def overview_info(self) :
+
+    def intens_im_to_load(self) :
+        ## from hseg_archetype file contents
+        pass
+
+    def intens_im_to_make(self) :
+        ## from meta_data
+        pass
+
+    def create_hseg_files_cabs(self) :
+        # cab = br.CollectionArchetypeBuilder()
+        #
+        # for hseg in self.hsegs() :
+        #     all_file_dict = hseg.file_dict()
+        #     all_file_dict.update(hseg.cell_file_dict())
+        #     all_file_dict.update(hseg.bin_file_dict())
+        #     cab.add_collection(hseg.name, all_file_dict)
+        #
+        # hseg_at, hseg_at_deviations = cab.get_archetype_info()
+        # hseg_at_inc = cab.archetype_inclusive
+        #
+        # at_str = ''
+        # for val in hseg_at :
+        #     at_str += str(val) + '\n'
+        #
+        # chf_panel = self.make_chf_panel(at_str)
+        # hseg_tree_panel = self.make_hseg_tree_panel(hseg_at_deviations)
+
+        self._hseg_all_files_cab = br.CollectionArchetypeBuilder()
+        self._hseg_files_cab = br.CollectionArchetypeBuilder()
+        self._hseg_bin_files_cab = br.CollectionArchetypeBuilder()
+        self._hseg_cell_files_cab = br.CollectionArchetypeBuilder()
+
+        for hseg in self.hsegs() :
+            # temp_dict = hseg.file_dict()
+            temp_dict = {}
+            temp_dict.update(hseg.file_dict())
+            temp_dict.update(hseg.bin_file_dict())
+            temp_dict.update(hseg.cell_file_dict())
+            self._hseg_all_files_cab.add_collection(hseg.name, temp_dict)
+            self._hseg_files_cab.add_collection(hseg.name, hseg.file_dict())
+            self._hseg_bin_files_cab.add_collection(hseg.name, hseg.bin_file_dict())
+            self._hseg_cell_files_cab.add_collection(hseg.name, hseg.cell_file_dict())
+        self._hseg_all_files_cab.create_all()
+        self._hseg_files_cab.create_all()
+        self._hseg_bin_files_cab.create_all()
+        self._hseg_cell_files_cab.create_all()
+
+    @br.lazy_eval
+    def hseg_all_files_cab(self) :
+        self.create_hseg_files_cabs()
+
+    @br.lazy_eval
+    def hseg_files_cab(self) :
+        self.create_hseg_files_cabs()
 
 
+
+    @br.lazy_eval
+    def hseg_bin_files_cab(self) :
+        self.create_hseg_files_cabs()
+
+    @br.lazy_eval
+    def hseg_cell_files_cab(self) :
+        self.create_hseg_files_cabs()
 
     # } </dev>
 
@@ -147,9 +223,13 @@ class Exper :
                         print('exception trying to init hseg {}: {}'.format(file_name, e))
 
     @br.lazy_eval
+    def meta_data_path(self) :
+        self._meta_data_path = os.path.join(self.path, self.name + Exper.META_SUF)
+
+    @br.lazy_eval
     def meta_data(self) :
-        meta_data_path = os.path.join(self.path, self.name + Exper.META_SUF)
-        self._meta_data = run_path(meta_data_path)
+        # meta_data_path = os.path.join(self.path, self.name + Exper.META_SUF)
+        self._meta_data = run_path(self._meta_data_path)
 
     @br.lazy_eval
     def hseg_slices(self) :
@@ -326,7 +406,9 @@ class Exper :
             except HsegDeactivated as hd :
                 print(hd)
 
+    # } </processing>
 
+# { <output>
     def output_new_hdings(self) :
         cell_sheet = []
         nuc_sheet = []
@@ -477,7 +559,7 @@ class Exper :
 
 
 
-    # } </processing>
+    # } </output>
 
 # { <to_string functions>
 
@@ -501,3 +583,8 @@ class Exper :
         return self.get_id()
 
     # } </to_string functions>
+
+
+# class ExperMetaData :
+#
+#     def __init__(hseg_slices

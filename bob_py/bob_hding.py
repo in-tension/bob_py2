@@ -3,7 +3,7 @@ from functools import total_ordering
 import brutils as br
 import fiji_utils as futils
 
-from .bob_exception import BobException
+from .bob_exceptions import BobException
 
 
 @total_ordering

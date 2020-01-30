@@ -19,3 +19,5 @@ class BobException(Exception) :
 class HsegDeactivated(BobException) :
     pass
     # def __init__(self)
+
+# class BobMissingData(BobException) :
