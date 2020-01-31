@@ -43,15 +43,14 @@ bpg = bob_py.BobGui()
 #print(bob_py.BobPyTreeCellRenderer.gui_folder)
 
 
-if False :
-	
-	bpg.got_exper(exper_path)
-	
-	#bpg.exper.hseg
-	e = bpg.exper
-	h = e.hsegs()[0]
-	c = h.cells()[0]
-	n = c.nucs()[0]
+
+bpg.got_exper(exper_path)
+
+#bpg.exper.hseg
+e = bpg.exper
+h = e.hsegs()[0]
+c = h.cells()[0]
+n = c.nucs()[0]
 
 #for intens_im in h.intens_ims().values() :
 #	intens_im.show()
