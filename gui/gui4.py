@@ -30,7 +30,7 @@ class ActionListenerFactory(AbstractAction) :
         self.func(e)
 
 
-class BobPyGui(JFrame) :
+class BobGui(JFrame) :
 
 
     def choose_dir_al(self, e) :
@@ -122,7 +122,7 @@ class BobPyGui(JFrame) :
 
 
     def __init__(self):
-        super(BobPyGui, self).__init__("BobPy")
+        super(BobGui, self).__init__("BobPy")
 
         self.dir_path = ''
 
@@ -161,4 +161,4 @@ class BobPyGui(JFrame) :
 
 
 
-bpg = BobPyGui()
+bpg = BobGui()

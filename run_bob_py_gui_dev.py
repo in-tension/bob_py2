@@ -26,53 +26,20 @@ import bob_py
 imp.reload(bob_py)
 
 
-
-
 from ij.plugin.frame import RoiManager
 
 
 
-
+#from .bob_py_gui import BobGui
 
 exper_path = "/Users/baylieslab/Documents/Amelia/data/steffiData/150511_Lim3b-GFP_Hoe-GFP-H4K16ac-Fib-DL-Phal"
 
-t = br.tic()
+#t = br.tic()
 
 #bob_py.Exper.setup()
 
-#1/0
-exp = bob_py.Exper(exper_path)
-h = exp.hsegs()[1]
-c = h.cells()[0]
-n = c.nucs()[0]
-
-#h.raw_stack().show()
-exp.make_data()
-
-#1/0
-
-#h.raw_stack().show()
-#
-#
-#sb = br.SimilarityBuilder() 
-#
-#for hseg in exp.hsegs() :
-#	all_file_dict = hseg.file_dict()
-#	all_file_dict.update(hseg.cell_file_dict())
-#	all_file_dict.update(hseg.bin_file_dict())
-#	sb.add_group(hseg.name, all_file_dict)
-#
-#simprofile, comparisons = sb.simprofile_comparison()
-#pprint(simprofile)
-#pprint(comparisons)
+bpg = bob_py.BobGui()
+bpg.got_exper(exper_path)
 
 
-
-#exp.make_data()
-#
-#exp.output_cell_cols_def()
-#exp.output_nuc_cols_def()
-
-
-
-br.ptoc(t)
+#br.ptoc(t)

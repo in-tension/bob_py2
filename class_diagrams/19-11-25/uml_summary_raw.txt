@@ -41,7 +41,7 @@ class Hseg {
 
   .. Methods ..
     ~ get_roi_dict(name)
-    ~ open_hseg_imp(suf)
+    ~ open_hseg_im(suf)
 }
 
 class Cell {

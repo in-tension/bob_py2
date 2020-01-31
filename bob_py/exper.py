@@ -105,7 +105,7 @@ class Exper :
     # } </static_and_class_methods>
 
 
-    def __init__(self, path) :
+    def __init__(self, path, gui=None) :
         """
         Args:
             msg (str): Human readable string describing the exception.
@@ -124,21 +124,35 @@ class Exper :
         """name is the first two terms of experiment directory name, where terms are split by '_'"""
 
 
+        self.gui = gui
+        self.log('Experiment {} initialized'.format(self.name))
+
+
 
 
 # { <dev>
 
+
+    def log(self, text) :
+        if self.gui == None :
+            print(text)
+        else :
+            self.gui.log(text)
+
+
     # def overview_info(self) :
 
+    @br.lazy_eval_or_except
     def intens_im_to_load(self) :
-        ## from hseg_archetype file contents
-        pass
+        self.create_hseg_file_cabs
 
-    def intens_im_to_make(self) :
+    def intens_im_to_create(self) :
         ## from meta_data
-        pass
+        self._intens_im_to_create = self.get_meta_data('intens_im_to_create')
 
-    def create_hseg_files_cabs(self) :
+    # def meta_data
+
+    def create_hseg_file_cabs_old(self) :
         # cab = br.CollectionArchetypeBuilder()
         #
         # for hseg in self.hsegs() :
@@ -177,23 +191,47 @@ class Exper :
         self._hseg_bin_files_cab.create_all()
         self._hseg_cell_files_cab.create_all()
 
-    @br.lazy_eval
-    def hseg_all_files_cab(self) :
-        self.create_hseg_files_cabs()
+
+    def create_hseg_file_cabs(self) :
+
+        self._hseg_files_cab = br.CollectionArchetypeBuilder()
+        self._hseg_bin_files_cab = br.CollectionArchetypeBuilder()
+        self._hseg_cell_files_cab = br.CollectionArchetypeBuilder()
+        self._hseg_intens_im_files_cab = br.CollectionArchetypeBuilder()
+
+        for hseg in self.hsegs() :
+
+            self._hseg_files_cab.add_collection(hseg.name, hseg.file_path_dict())
+            self._hseg_bin_files_cab.add_collection(hseg.name, hseg.bin_file_dict())
+            self._hseg_cell_files_cab.add_collection(hseg.name, hseg.cell_file_dict())
+            self._hseg_intens_im_files_cab.add_collection(hseg.name, hseg.intens_im_file_dict())
+        self._hseg_files_cab.create_all()
+        self._hseg_bin_files_cab.create_all()
+        self._hseg_cell_files_cab.create_all()
+        self._hseg_intens_im_files_cab.create_all()
+        self._intens_im_to_load = self._hseg_intens_im_files_cab.archetype
+
+    # @br.lazy_eval
+    # def hseg_all_files_cab(self) :
+    #     self.create_hseg_file_cabs()
 
     @br.lazy_eval
     def hseg_files_cab(self) :
-        self.create_hseg_files_cabs()
+        self.create_hseg_file_cabs()
 
 
 
     @br.lazy_eval
     def hseg_bin_files_cab(self) :
-        self.create_hseg_files_cabs()
+        self.create_hseg_file_cabs()
 
     @br.lazy_eval
     def hseg_cell_files_cab(self) :
-        self.create_hseg_files_cabs()
+        self.create_hseg_file_cabs()
+
+    @br.lazy_eval
+    def hseg_intens_im_files_cab(self) :
+        self.create_hseg_file_cabs()
 
     # } </dev>
 
@@ -220,7 +258,7 @@ class Exper :
                     try :
                         self._hsegs.append(Hseg(self, file_name))
                     except Exception as e :
-                        print('exception trying to init hseg {}: {}'.format(file_name, e))
+                        self.log('exception trying to init hseg {}: {}'.format(file_name, e))
 
     @br.lazy_eval
     def meta_data_path(self) :
@@ -229,7 +267,15 @@ class Exper :
     @br.lazy_eval
     def meta_data(self) :
         # meta_data_path = os.path.join(self.path, self.name + Exper.META_SUF)
-        self._meta_data = run_path(self._meta_data_path)
+        self._meta_data = run_path(self.meta_data_path())
+
+    def get_meta_data(self, name) :
+        if name not in self._meta_data :
+            raise br.LazyEvalException('did not find {} in meta_data file'.format(name))
+        else :
+            return self.meta_data()[name]
+
+
 
     @br.lazy_eval
     def hseg_slices(self) :
@@ -327,8 +373,8 @@ class Exper :
                         nuc_aggr_rows.append(nuc_row)
 
             except Exception as e :
-                print(e)
-                print(hseg.name)
+                self.log(e)
+                self.log(hseg.name)
 
         self._cell_aggr_col_dict = {}
         for c in range(len(cell_hdings)) :
@@ -374,7 +420,7 @@ class Exper :
 
     def deactivate_hseg(self, hseg_name, message=None) :
 
-        print('error occured and hseg {} is no longer being processed'.format(hseg_name))
+        self.log('error occured and hseg {} is no longer being processed'.format(hseg_name))
         hseg = self.get_hseg_dict()[hseg_name]
         hseg.inactive = True
 
@@ -404,7 +450,11 @@ class Exper :
             try :
                 hseg.make_data()
             except HsegDeactivated as hd :
-                print(hd)
+                self.log(hd)
+
+            except Exception as e :
+                self.log(br.exception_str(e))
+                raise
 
     # } </processing>
 
@@ -480,8 +530,8 @@ class Exper :
                         row.extend(nuc_row)
                         nuc_sheet.append(row)
             except Exception as e :
-                print(e)
-                print(hseg.name)
+                self.log(e)
+                self.log(hseg.name)
                 # raise
 
 
@@ -507,7 +557,6 @@ class Exper :
             rows.append([label])
 
         for cell_col_hding in cell_col_hdings :
-            # br.temp_print(cell_col_hding)
             for i in range(len(self.cell_aggr_col_dict()[cell_col_hding])) :
                 rows[i].append(self.cell_aggr_col_dict()[cell_col_hding][i])
         hdings = ['Labels']
@@ -515,9 +564,8 @@ class Exper :
         rows.insert(0, hdings)
 
         outpath = br.dated_file_path(self.output_path(), '_'.join([self.name, 'cells.csv']))
-        # print(outpath)
         br.rows_to_csv(rows, outpath)
-        print('cell data saved: {}'.format(outpath))
+        self.log('cell data saved: {}'.format(outpath))
 
 
     def output_nuc_cols_def(self) :
@@ -547,13 +595,12 @@ class Exper :
 
         br.rows_to_csv(rows, outpath)
 
-        print('nuc data saved: {}'.format(outpath))
+        self.log('nuc data saved: {}'.format(outpath))
 
 
     def make_bob_hdings_list(self,input_hdings) :
         output_bob_hdings = []
         for item in input_hdings :
-            # print(item)
             output_bob_hdings.append(BobHding.make_bob_hding(item, self.channel_dict()))
         return output_bob_hdings
 

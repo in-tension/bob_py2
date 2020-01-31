@@ -28,7 +28,7 @@ class ActionListenerFactory(AbstractAction) :
         self.func(e)
 
 
-class BobPyGui(JFrame) :
+class BobGui(JFrame) :
 
 
     def choose_dir_al(self, e) :
@@ -116,7 +116,7 @@ class BobPyGui(JFrame) :
         self.panel.add(self.run_button)
 
 
-        super(BobPyGui, self).__init__("BobPy")
+        super(BobGui, self).__init__("BobPy")
         self.getContentPane().add(self.panel)
         self.pack()
         self.setLocationRelativeTo(None)
@@ -125,4 +125,4 @@ class BobPyGui(JFrame) :
 
 
 
-bpg = BobPyGui()
+bpg = BobGui()

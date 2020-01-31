@@ -31,7 +31,7 @@ bob_py
 			roi_dict()
 		methods
 			get_roi_dict(name)
-			open_hseg_imp(suf)
+			open_hseg_im(suf)
 
 
 

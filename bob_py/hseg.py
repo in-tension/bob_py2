@@ -37,13 +37,24 @@ class Hseg :
     RAW_SUF = '.tif'
     # NUC_BIN_SUF = 'Nuc-bin.tif'
 
-    NUC_BIN_SUF = 'Nuc'
+    # NUC_BIN_SUF = 'Nuc'
+    #
+    # BIN_SUF_REGEX = '([^-]*)-bin.tif'
+    # BIN_SUF_PATTERN = re.compile(BIN_SUF_REGEX)
+    #
+    # CELL_SUF_REGEX = 'XY-([^\.]*).csv'
+    # CELL_SUF_PATTERN = re.compile(CELL_SUF_REGEX)
 
-    BIN_SUF_REGEX = '([^-]*)-bin.tif'
+    NUC_BIN_SUF = '_Nuc-bin.tif'
+
+    BIN_SUF_REGEX = '_([^-]*)-bin.tif'
     BIN_SUF_PATTERN = re.compile(BIN_SUF_REGEX)
 
-    CELL_SUF_REGEX = 'XY-([^\.]*).csv'
+    CELL_SUF_REGEX = '_XY-([^\.]*).csv'
     CELL_SUF_PATTERN = re.compile(CELL_SUF_REGEX)
+
+    INTENS_IM_SUF_REGEX = '_([^\.]*).tif'
+    INTENS_IM_SUF_PATTERN = re.compile(INTENS_IM_SUF_REGEX)
 
 
 # { <static_and_class_methods>
@@ -87,11 +98,38 @@ class Hseg :
     def itens_im(self) :
         self._intens_im = {}
         for itens_im_name in self.exper.intens_im_to_load() :
-            itens_im
+            self._intens_im[intens_im_name] = self.open_hseg_im(self.intens_im_file_dict[intens_im_name])
 
+        # intens_im_to_create
+        try :
+            for intens_im_name, info_tup in self.exper.intens_im_to_create() :
+                self._intens_im[intens_im_name] = self.create_intens_im(info_tup)
+        except LazyEvalException :
+            pass
     # def raw_stack(self) :
     #     if not self.has_raw_stack :
     #         raise Bob
+
+
+    @br.lazy_eval_or_except
+    def file_path_dict(self) :
+        self.create_file_dicts()
+
+    @br.lazy_eval_or_except
+    def cell_file_dict(self) :
+        self.create_file_dicts()
+
+    @br.lazy_eval_or_except
+    def bin_file_dict(self) :
+        self.create_file_dicts()
+
+
+    @br.lazy_eval_or_except
+    def intens_im_file_dict(self) :
+        self.create_file_dicts()
+
+
+
 
 
 
@@ -100,7 +138,7 @@ class Hseg :
 # { <properties>
 
     @br.lazy_eval
-    def file_dict(self) :
+    def file_dict_old(self) :
         """
             `property`
             keys -> file_suf
@@ -109,7 +147,7 @@ class Hseg :
         self.create_file_dicts()
 
     @br.lazy_eval
-    def cell_file_dict(self) :
+    def cell_file_dict_old(self) :
         """
             `property`
             just cell rois
@@ -119,10 +157,10 @@ class Hseg :
         self.create_file_dicts()
 
     @br.lazy_eval
-    def bin_file_dict(self) :
+    def bin_file_dict_old(self) :
         self.create_file_dicts()
 
-    def create_file_dicts(self) :
+    def create_file_dicts_old(self) :
         """
             makes
             - _file_dict
@@ -155,13 +193,45 @@ class Hseg :
 
                 # will move this to
 
+
+
+
+
+    def create_file_dicts(self) :
+        self._file_path_dict = {}
+        self._cell_file_dict = {}
+        self._bin_file_dict = {}
+        self._intens_im_file_dict = {}
+
+        files = os.listdir(self.path)
+
+        for file_name in files :
+            if file_name.startswith(self.get_id()) :
+                suf = file_name.replace(self.get_id(), '')
+
+                file_path = os.path.join(self.path, file_name)
+                self._file_path_dict[suf] = file_path
+
+
+                cellm = Hseg.CELL_SUF_PATTERN.match(suf)
+                binm = Hseg.BIN_SUF_PATTERN.match(suf)
+                intens_imm = Hseg.INTENS_IM_SUF_PATTERN.match(suf)
+
+                if cellm :
+                    self._cell_file_dict[cellm.group(1)] = suf
+                elif binm :
+                    self._bin_file_dict[binm.group(1)] = suf
+                elif intens_imm :
+                    self._intens_im_file_dict[intens_imm.group(1)] = suf
+
+
     @br.lazy_eval
     def slices(self) :
         self._slices = self.exper.hseg_slices()[self.name]
 
     @br.lazy_eval_or_except
     def raw_stack(self) :
-        self._raw_stack = self.open_hseg_imp(Hseg.RAW_SUF)
+        self._raw_stack = self.open_hseg_im(Hseg.RAW_SUF)
 
     @br.lazy_eval
     def cal(self) :
@@ -169,32 +239,33 @@ class Hseg :
 
     @br.lazy_eval
     def nuc_bin(self) :
-        self._nuc_bin = self.open_hseg_imp(Hseg.NUC_BIN_SUF)
+        self._nuc_bin = self.open_hseg_im(Hseg.NUC_BIN_SUF)
 
-    def open_hseg_imp_old(self, suf) :
+    def open_hseg_im_old(self, suf) :
         """open imp which starts with <hseg.get_id()>_<suf>"""
-        if suf not in self.file_dict() :
+        if suf not in self.file_path_dict() :
             imp = None
             IJ.log('hemisegment {} does not have raw tif file {}'.format(self.name, self.name + suf))
             ## raise Exception('hemisegment {} does not have raw tif file {}'.format(self.name, self.name + suf))
 
         else :
-            imp = IJ.openImage(self.file_dict()[suf])
+            imp = IJ.openImage(self.file_path_dict()[suf])
 
         return imp
 
-    ## lazy_eval_or_except
-    def open_hseg_imp(self, suf) :
+    def open_hseg_im(self, suf) :
         """open imp which starts with <hseg.get_id()>_<suf>"""
-        if suf in self.file_dict() :
-            imp = IJ.openImage(self.file_dict()[suf])
-        elif suf in self.bin_file_dict() :
-            imp = IJ.openImage(self.bin_file_dict()[suf])
-        else :
-            message = 'hemisegment {} does not have tif file {}'.format(self.name, self.get_id() + suf)
-            # 1/0
-            raise br.LazyEvalException('Hseg.open_hseg_imp', message)
+        # if suf in self.file_path_dict() :
+        #     imp = IJ.openImage(self.file_path_dict()[suf])
+        # elif suf in self.bin_file_dict() :
+        #     imp = IJ.openImage(self.bin_file_dict()[suf])
+        # else :
 
+        if suf not in self.file_path_dict() :
+            message = 'hemisegment {} does not have tif file {}'.format(self.name, self.get_id() + suf)
+            raise br.LazyEvalException('Hseg.open_hseg_im', message)
+        else :
+            imp = IJ.openImage(self.file_path_dict()[suf])
 
 
         return imp
@@ -207,7 +278,8 @@ class Hseg :
             self.exper.deactivate_hseg(self.name, 'no cell coordinate files found')
 
         self._cells = []
-        for cell_name, cell_path in self.cell_file_dict().items() :
+        for cell_name, cell_suf in self.cell_file_dict().items() :
+            cell_path = self.file_path_dict()[cell_suf]
             self._cells.append(Cell(self, cell_name, cell_path))
 
 
@@ -217,6 +289,11 @@ class Hseg :
         prj_imp = futils.make_projection(self.raw_stack(), prj_method, self.slices())
 
         self._prj_imps[prj_method] = prj_imp
+
+
+
+    def file_dict_to_path(self, some_file_dict, key) :
+        return self.file_path_dict()[some_file_dict[key]]
 
 
     # def
@@ -310,6 +387,12 @@ class Hseg :
         prj_imp.setC(channel_def.num)
         return prj_imp
 
+    def create_intens_im(self, channel_def) :
+        prj_imp = self.prj_imps(channel_def.prj_method)
+        prj_imp.setC(channel_def.num)
+        intens_im = IJ.run("Duplicate...", "duplicate channels={}".format(channel_def.num));
+        return intens_im
+
     # } </general>
 
 # { <processing:make_data>
@@ -388,8 +471,8 @@ class Hseg :
 
 # { <to_string functions>
 
-    def log(self, message) :
-        print(self.get_short_id() + ': ' + message)
+    # def log(self, message) :
+    #     print(self.get_short_id() + ': ' + message)
 
     def get_prefix(self) :
         """For logging: prints name tabbed out appropriately"""

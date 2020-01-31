@@ -36,7 +36,7 @@ bob_py
 			create_nucs()
 			create_roi_dicts()
 			get_roi_dict(name)
-			open_hseg_imp(suf)
+			open_hseg_im(suf)
 
 
 

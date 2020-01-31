@@ -55,7 +55,7 @@
 <text x="-106.66666666666667" y="571.0" font-size="14" font-family="arial">raw_stack()</text>
 <text x="-106.66666666666667" y="588.0" font-size="14" font-family="arial">cal()</text>
 <text x="-106.66666666666667" y="605.0" font-size="14" font-family="arial">nuc_bin()</text>
-<text x="-106.66666666666667" y="622.0" font-size="14" font-family="arial">open_hseg_imp(suf)</text>
+<text x="-106.66666666666667" y="622.0" font-size="14" font-family="arial">open_hseg_im(suf)</text>
 <text x="-106.66666666666667" y="639.0" font-size="14" font-family="arial">cells()</text>
 <text x="-106.66666666666667" y="656.0" font-size="14" font-family="arial">prj_imps(prj_method)</text>
 <text x="-106.66666666666667" y="673.0" font-size="14" font-family="arial">roi_dicts(roi_dict_name)</text>

@@ -1,0 +1,3 @@
+Aspirational Features/Options/Changes
+=====================================
+ - ability to change the suf of a particular hseg file in all hemisegments of an experiment

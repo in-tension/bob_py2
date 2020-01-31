@@ -42,7 +42,7 @@
 |~get_channel_name()              |  |~create_nucs()                   |                                                                   
 |~get_prefix()                    |  |~create_roi_dicts()              |                                                                   
 |~get_id()                        |  |~get_roi_dict(roi_dict_name)     |                                                                   
-|~__str__()                       |  |~open_hseg_imp(suf)              |                                                                   
+|~__str__()                       |  |~open_hseg_im(suf)              |                                                                   
 |~__repr__()                      |  |~get_prefix()                    |                                                                   
 |#setup()                         |  |~get_id()                        |                                                                   
 `---------------------------------'  |~get_short_id()                  |                                                                   

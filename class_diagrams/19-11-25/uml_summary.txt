@@ -19,5 +19,5 @@
 |+calc_dict()        |  |+cells()           |   |~add_nuc()          |                             
 |~create_out_dir()   |  |+roi_dicts()       |   |#read_roi_csv(cal)  |                             
 |~get_channel_name() |  |~get_roi_dict(name)|   `--------------------'                             
-|#setup()            |  |~open_hseg_imp(suf)|                                                      
+|#setup()            |  |~open_hseg_im(suf)|                                                      
 `--------------------'  `-------------------'                                                      

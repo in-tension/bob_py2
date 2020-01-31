@@ -84,7 +84,7 @@ class Hseg {
     ~ create_roi_dicts()
   .. Methods ..
     ~ get_roi_dict(roi_dict_name)
-    ~ open_hseg_imp(suf)
+    ~ open_hseg_im(suf)
   .. Methods - toString ..
     ~ get_prefix()
     ~ get_id()
