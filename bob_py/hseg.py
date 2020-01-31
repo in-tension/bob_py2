@@ -95,16 +95,21 @@ class Hseg :
 # { <dev>
 
     @br.lazy_eval
-    def itens_im(self) :
-        self._intens_im = {}
-        for itens_im_name in self.exper.intens_im_to_load() :
-            self._intens_im[intens_im_name] = self.open_hseg_im(self.intens_im_file_dict[intens_im_name])
+    def intens_ims(self) :
+        self._intens_ims = {}
+        for intens_im_name in self.exper.intens_im_to_load() :
+            # print('load')
+            self._intens_ims[intens_im_name] = self.open_hseg_im(self.intens_im_file_dict()[intens_im_name])
 
         # intens_im_to_create
+        # br.dprint(self.exper.intens_im_to_create(),'hseg:create')
+        # br.dprint(self.exper.intens_im_to_load(),'hseg:load')
         try :
-            for intens_im_name, info_tup in self.exper.intens_im_to_create() :
-                self._intens_im[intens_im_name] = self.create_intens_im(info_tup)
-        except LazyEvalException :
+            for intens_im_name, info_tup in self.exper.intens_im_to_create().items() :
+                # print('create')
+                self._intens_ims[intens_im_name] = self.create_intens_im(info_tup)
+        except br.LazyEvalException :
+            print('caught')
             pass
     # def raw_stack(self) :
     #     if not self.has_raw_stack :
@@ -283,7 +288,6 @@ class Hseg :
             self._cells.append(Cell(self, cell_name, cell_path))
 
 
-    ## remove?
     @br.lazy_eval_dict
     def prj_imps(self, prj_method) :
         prj_imp = futils.make_projection(self.raw_stack(), prj_method, self.slices())
@@ -292,11 +296,9 @@ class Hseg :
 
 
 
+
     def file_dict_to_path(self, some_file_dict, key) :
         return self.file_path_dict()[some_file_dict[key]]
-
-
-    # def
 
 
     @br.lazy_eval_dict
@@ -381,16 +383,18 @@ class Hseg :
 
         return cell_dict
 
+    ## remove?
     def get_prj_imp_ch(self, channel_def) :
         prj_imp = self.prj_imps(channel_def.prj_method)
 
         prj_imp.setC(channel_def.num)
         return prj_imp
 
-    def create_intens_im(self, channel_def) :
-        prj_imp = self.prj_imps(channel_def.prj_method)
-        prj_imp.setC(channel_def.num)
-        intens_im = IJ.run("Duplicate...", "duplicate channels={}".format(channel_def.num));
+    def create_intens_im(self, info_tup) :
+        prj_imp = self.prj_imps(info_tup[1])
+        prj_imp.setC(info_tup[0])
+        # intens_im = IJ.run("Duplicate...", "duplicate channels={}".format(info_tup[0]));
+        intens_im = futils.duplicate_channel(prj_imp, self.slices()[0], self.slices()[1], info_tup[0])
         return intens_im
 
     # } </general>
@@ -406,7 +410,8 @@ class Hseg :
         self.make_raw_data()
         self.make_summary_data()
 
-    def make_raw_data(self) :
+
+    def make_raw_data_old(self) :
         to_msr = self.exper.to_msr()
 
         for hding in to_msr :
@@ -429,10 +434,37 @@ class Hseg :
 
             self.rt_data_to_cells(rt_dict, hding)
 
-    def make_summary_data(self) :
-        to_summarize = self.exper.to_summarize()
+    def make_raw_data(self) :
+        to_msr_geo = self.exper.to_msr_geo()
 
-        for hding in to_summarize :
+        for roi_set in to_msr_geo :
+            roi_dict = self.roi_dicts(roi_set)
+            # if len(roi_dict) == 0 : self.log('roi_dict empty')
+            imp = self.raw_stack()
+            meas_int = futils.MEAS_GEO
+
+            rt_dict = futils.measure_roi_dict(imp, roi_dict, set_measure=meas_int)
+
+            hding_subpart = BobHding(roi_set=roi_set)
+            self.rt_data_to_cells(rt_dict, hding_subpart)
+
+        for channel_name, roi_sets in self.exper.to_msr_intens().items() :
+            # imp = self.get_prj_imp_ch(hding.channel_def)
+            imp = self.intens_ims()[channel_name]
+            for roi_set in roi_sets :
+
+                roi_dict = self.roi_dicts(roi_set)
+                meas_int = futils.MEAS_INTENS_XY
+
+                rt_dict = futils.measure_roi_dict(imp, roi_dict, set_measure=meas_int)
+
+                hding_subpart = BobHding(roi_set=roi_set, channel_name=channel_name)
+                self.rt_data_to_cells(rt_dict, hding_subpart)
+
+    def make_summary_data(self) :
+        to_summarize_hdings = self.exper.to_summarize_hdings()
+
+        for hding in to_summarize_hdings :
             for cell in self.cells() :
                 cell.calc_summary_data(hding)
 

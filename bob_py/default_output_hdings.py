@@ -15,10 +15,10 @@ default_cell_output_hdings = [
     ## ["Nuc", "Hoe", "Ploidy", "Tot"],
     ["Nuc", "Hoe", "IntDen", "Avg"],
     ["Nuc", "Hoe", "IntDen", "Tot"],
-    ["Nuc", "Fib-bin", "Mean", "Avg"],
-    ["Nuc", "Fib-bin", "Mean", "Tot"],
-    ["Nuc", "Fib-bin", "IntDen", "Tot"],
-    ["Nuc", "Fib-bin", "IntDen", "Tot"]]
+    ["Nuc", "Fib", "Mean", "Avg"],
+    ["Nuc", "Fib", "Mean", "Tot"],
+    ["Nuc", "Fib", "IntDen", "Tot"],
+    ["Nuc", "Fib", "IntDen", "Tot"]]
 
 default_nuc_output_hdings = [
     ["Nuc", "Area"],
@@ -41,18 +41,18 @@ default_nuc_output_hdings = [
     ## ["Nuc", "Hoe", "Ploidy", "Norm"],
 
 
-    ["Nuc", "H3K9ac", "Mean"],
-    ["Nuc", "H3K9ac", "StdDev"],
-    ["Nuc", "H3K9ac", "IntDen"],
-    ["Nuc", "H3K9ac", "IntDen", "Norm"],
-    ["Nuc", "H3K9ac", "RawIntDen"],
+    ["Nuc", "H4K16ac", "Mean"],
+    ["Nuc", "H4K16ac", "StdDev"],
+    ["Nuc", "H4K16ac", "IntDen"],
+    ["Nuc", "H4K16ac", "IntDen", "Norm"],
+    ["Nuc", "H4K16ac", "RawIntDen"],
 
 
-    ["Nuc", "Fib-bin", "Mean"],
-    ["Nuc", "Fib-bin", "Mean", "Norm"],
-    ["Nuc", "Fib-bin", "StdDev"],
-    ["Nuc", "Fib-bin", "IntDen"],
-    ["Nuc", "Fib-bin", "IntDen", "Norm"],
-    ["Nuc", "Fib-bin", "%Area"],
-    # ["Nuc", "Fib-bin", "Area"]
+    ["Nuc", "Fib", "Mean"],
+    ["Nuc", "Fib", "Mean", "Norm"],
+    ["Nuc", "Fib", "StdDev"],
+    ["Nuc", "Fib", "IntDen"],
+    ["Nuc", "Fib", "IntDen", "Norm"],
+    ["Nuc", "Fib", "%Area"],
+    # ["Nuc", "Fib", "Area"]
     ]

@@ -20,6 +20,7 @@ from net.miginfocom.swing import MigLayout
 
 
 import bob_py
+from bob_py.default_meta_data_text import default_meta_data
 import brutils as br
 
 
@@ -50,7 +51,9 @@ class BobPyTreeCellRenderer(DefaultTreeCellRenderer) :
     # gui_folder = '/Users/baylieslab/Documents/Amelia/code_dev/projects/bob_py/master/gui/'
 
 
-    gui_folder = os.path.join(os.path.dirname(__file__), 'resources')
+    # gui_folder = os.path.join(os.path.dirname(__file__), 'resources')
+    # IJ.log(gui_folder)
+    gui_folder = '/bob_py/resources'
 
     icon_file_names = {'exper':'ExperPurple.png', 'hseg':'HsegDarkBlue.png', 'cell':'CellAqua.png', 'nuc':'NucGreen.png'}
     #
@@ -79,7 +82,12 @@ class BobPyTreeCellRenderer(DefaultTreeCellRenderer) :
 
     def create_icon(self, path) :
         try :
-            im = ImageIO.read(File(path))
+            # im = ImageIO.read(File(path))
+            # im_url = self.getClass().getResource(path)
+            # im = ImageIO.read(im_url)
+            ins = self.getClass().getResourceAsStream(path)
+            # reader = BufferedReader(InputStreamReader(is))
+            im = ImageIO.read(ins)
         except :
             raise
 
@@ -94,15 +102,12 @@ class BobGui(JFrame) :
 
     def __init__(self) :
         super(BobGui, self).__init__('BobPy')
-        # print(__file__)
-        # cls = self.getClass()
-        # print(cls)
-
-        # self.setLayout(MigLayout())
+        # IJ.log('okay?')
+        # print('okay??')
         self.setLayout(BorderLayout())
         self.main_panel = JPanel()
+        # self.main_panel.setLayout(MigLayout('insets 1 10 1 1'))
         self.main_panel.setLayout(MigLayout())
-
 
 
         dir_panel = JPanel()
@@ -119,8 +124,7 @@ class BobGui(JFrame) :
         dir_button.addActionListener(ActionListenerFactory(self, self.choose_dir_al))
         dir_panel.add(dir_button)
 
-
-        self.main_panel.add(dir_panel, 'growx, spanx, pushx, wrap')
+        self.main_panel.add(dir_panel, 'wrap, growx, spanx, pushx')
 
 
         add_key_args(self.main_panel, 'close_w', ActionListenerFactory(self, self.close_al), KeyEvent.VK_W, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())
@@ -128,60 +132,15 @@ class BobGui(JFrame) :
 
         self.add(self.main_panel, BorderLayout.CENTER)
 
-        self.setPreferredSize(Dimension(500,400))
+        self.setPreferredSize(Dimension(500,500))
 
         self.pack()
         self.setLocationRelativeTo(None)
         self.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE)
         self.setVisible(True)
 
-    def show_exper_info_old(self) :
-        # sb = br.SimilarityBuilder()
-        cab = br.CollectionArchetypeBuilder()
-
-        for hseg in self.exper.hsegs() :
-            all_file_dict = hseg.file_dict()
-            all_file_dict.update(hseg.cell_file_dict())
-            all_file_dict.update(hseg.bin_file_dict())
-            cab.add_collection(hseg.name, all_file_dict)
-
-        hseg_at, hseg_at_deviations = cab.get_archetype_info()
-
-        at_str = ''
-        for val in hseg_at :
-            at_str += str(val) + '\n'
-
-        chf_panel = self.make_chf_panel(at_str)
-        hseg_tree_panel = self.make_hseg_tree_panel(hseg_at_deviations)
-
-
-        self.split_pane = JSplitPane(JSplitPane.HORIZONTAL_SPLIT)
-
-        self.split_pane.setOneTouchExpandable(True);
-        self.split_pane.setContinuousLayout(True);
-        self.split_pane.setResizeWeight(0.5)
-
-
-        self.split_pane.add(chf_panel)
-        self.split_pane.add(hseg_tree_panel)
-        self.main_panel.add(self.split_pane, 'grow')
-        self.revalidate()
 
     def show_exper_info(self) :
-        # sb = br.SimilarityBuilder()
-        # cab = br.CollectionArchetypeBuilder()
-        #
-        # for hseg in self.exper.hsegs() :
-        #     all_file_dict = hseg.file_dict()
-        #     all_file_dict.update(hseg.cell_file_dict())
-        #     all_file_dict.update(hseg.bin_file_dict())
-        #     cab.add_collection(hseg.name, all_file_dict)
-        #
-        # hseg_at, hseg_at_deviations = cab.get_archetype_info()
-        #
-        # at_str = ''
-        # for val in hseg_at :
-        #     at_str += str(val) + '\n'
 
         chf_panel = self.make_chf_panel()
         hseg_tree_panel = self.make_hseg_tree_panel()
@@ -204,32 +163,11 @@ class BobGui(JFrame) :
         self.revalidate()
 
 
-    def make_chf_panel_old(self, at_str) :
-        """ cf --> common hseg files """
-
-        chf_panel = JPanel()
-        # chf_panel.setLayout(BoxLayout(chf_panel, BoxLayout.Y_AXIS))
-        chf_panel.setLayout(MigLayout('insets 0'))
-        # chf_panel.setAlignmentX(Component.LEFT_ALIGNMENT)
-
-        chf_label = JLabel('Common Hemeisegment Files')
-        # chf_label.setAlignmentX(Component.LEFT_ALIGNMENT)
-
-        chf_panel.add(chf_label, 'grow, wrap')
-
-        chf_text_area = JTextArea(at_str)
-        chf_panel.add(chf_text_area, 'grow, push, span')
-        return chf_panel
-
     def make_chf_panel(self) :
         """ chf --> common hseg files """
 
         chf_panel = JPanel()
-        # chf_panel.setLayout(BoxLayout(chf_panel, BoxLayout.Y_AXIS))
         chf_panel.setLayout(MigLayout('insets 0'))
-        # chf_panel.setAlignmentX(Component.LEFT_ALIGNMENT)
-
-
 
 
         chf_files_label = JLabel('Hemisegment cells')
@@ -252,7 +190,15 @@ class BobGui(JFrame) :
         chf_panel.add(chf_files_label, 'growx, wrap')
         chf_panel.add(chf_files_text, 'grow, wrap')
 
-        return chf_panel
+
+        meta_data_file_buttton = JButton('Open/Create meta_data file')
+        meta_data_file_buttton.addActionListener(ActionListenerFactory(self, self.meta_data_al))
+
+        chf_panel.add(meta_data_file_buttton)
+        chf_scroll_pane = JScrollPane()
+        chf_scroll_pane.getViewport().setView(chf_panel)
+
+        return chf_scroll_pane
 
     @staticmethod
     def archetype_to_str(archetype) :
@@ -265,8 +211,6 @@ class BobGui(JFrame) :
 
     def make_hseg_tree_panel(self) :
         root = DefaultMutableTreeNode(self.exper.name)
-
-
 
         for hseg in self.exper.hsegs() :
             hseg_node = DefaultMutableTreeNode(hseg.name)
@@ -285,14 +229,16 @@ class BobGui(JFrame) :
         hseg_tree.setCellRenderer(BobPyTreeCellRenderer())
 
 
+
         hseg_scroll_pane = JScrollPane()
         hseg_scroll_pane.getViewport().setView((hseg_tree))
 
-        hseg_panel = JPanel(MigLayout())
+        hseg_panel = JPanel(MigLayout('insets 0'))
         hseg_panel.add(hseg_scroll_pane, 'grow, span, push, wrap')
 
         run_button = JButton('Run')
         run_button.addActionListener(ActionListenerFactory(self, self.run_al))
+
 
         hseg_panel.add(run_button)
 
@@ -313,6 +259,9 @@ class BobGui(JFrame) :
         self.dir_path = dc.getDirectory()
 
         self.dir_text_field.setText(self.dir_path)
+        # self.dir_text_field.setText('blerg')
+        # IJ.log('blerg')
+        # print('boop')
         self.got_exper(self.dir_path)
 
     def close_al(self, e) :
@@ -323,10 +272,18 @@ class BobGui(JFrame) :
         self.exper.make_data()
         self.exper.output_cell_cols_def()
         self.exper.output_nuc_cols_def()
+        br.dtoc(dt)
 
+    def meta_data_al(self, e) :
+        meta_data_path = self.exper.meta_data_path()
+        if not os.path.exists(meta_data_path) :
+            with open(meta_data_path, 'w') as f :
+                f.write(default_meta_data)
 
+        IJ.open(meta_data_path)
 
     def got_exper(self, dir_path) :
+        # IJ.log('exper')
         self.log_text = JTextArea()
 
         self.exper = bob_py.Exper(dir_path, gui=self)

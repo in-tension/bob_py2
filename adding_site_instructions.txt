@@ -1,0 +1,15 @@
+Help > Update...
+
+[Manage update sites]
+[Add my site]
+
+add https://sites.imagej.net/In-tension/
+
+[Close] the Manage update sites window
+
+[Apply changes]
+
+
+after restarting Fiji
+
+Packages>Run BobPy      (near the very very bottom)

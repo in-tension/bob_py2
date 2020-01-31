@@ -144,11 +144,13 @@ class Exper :
 
     @br.lazy_eval_or_except
     def intens_im_to_load(self) :
-        self.create_hseg_file_cabs
+        self.create_hseg_file_cabs()
 
+    @br.lazy_eval_or_except
     def intens_im_to_create(self) :
         ## from meta_data
         self._intens_im_to_create = self.get_meta_data('intens_im_to_create')
+        # br.dprint(self._intens_im_to_create, 'exper')
 
     # def meta_data
 
@@ -269,8 +271,18 @@ class Exper :
         # meta_data_path = os.path.join(self.path, self.name + Exper.META_SUF)
         self._meta_data = run_path(self.meta_data_path())
 
+
+    @br.lazy_eval_or_except
+    def to_msr_geo(self) :
+        self._to_msr_geo = self.get_meta_data('to_msr_geo')
+
+    @br.lazy_eval_or_except
+    def to_msr_intens(self) :
+        self._to_msr_intens = self.get_meta_data('to_msr_intens')
+
+
     def get_meta_data(self, name) :
-        if name not in self._meta_data :
+        if name not in self.meta_data() :
             raise br.LazyEvalException('did not find {} in meta_data file'.format(name))
         else :
             return self.meta_data()[name]
@@ -310,12 +322,23 @@ class Exper :
         for item in self.meta_data()["to_msr"] :
             self._to_msr.append(BobHding.make_bob_hding(item, channel_dict))
 
-    @br.lazy_eval
+    # @br.lazy_eval
+    # def to_summarize(self) :
+    #     self._to_summarize = []
+    #     channel_dict = self.channel_dict()
+    #     for item in self.meta_data()["to_summarize"] :
+    #         self._to_summarize.append(BobHding.make_bob_hding(item, channel_dict))
+
+    @br.lazy_eval_or_except
     def to_summarize(self) :
-        self._to_summarize = []
-        channel_dict = self.channel_dict()
-        for item in self.meta_data()["to_summarize"] :
-            self._to_summarize.append(BobHding.make_bob_hding(item, channel_dict))
+        self._to_summarize = self.get_meta_data('to_summarize')
+
+    @br.lazy_eval_or_except
+    def to_summarize_hdings(self) :
+        self._to_summarize_hdings = []
+        for tup in self.to_summarize() :
+            self._to_summarize_hdings.append(BobHding.make_bob_hding(tup))
+
 
 
     @br.lazy_eval
@@ -601,7 +624,7 @@ class Exper :
     def make_bob_hdings_list(self,input_hdings) :
         output_bob_hdings = []
         for item in input_hdings :
-            output_bob_hdings.append(BobHding.make_bob_hding(item, self.channel_dict()))
+            output_bob_hdings.append(BobHding.make_bob_hding(item))
         return output_bob_hdings
 
 

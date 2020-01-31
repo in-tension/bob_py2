@@ -56,7 +56,7 @@ class BobHding (object) :
         return ch_def, ch_str
 
     @staticmethod
-    def make_bob_hding(args) :
+    def make_bob_hding(args, channel_dict) :
         # print(args)
         if len(args) == 0 :
             raise BobException('BobHding.make_bob_hding: args empty')
@@ -76,17 +76,17 @@ class BobHding (object) :
 
 
         if temp in BobHding.POSS_MSR_PARAMS :
+            channel_def = None
             channel_name = None
             msr_param = temp
         else :
-            # channel_name = BobHding.parse_channel_input(temp, channel_dict)
-            channel_name = temp
+            channel_def, channel_name = BobHding.parse_channel_input(temp, channel_dict)
             try :
                 msr_param = next(args_iter)
                 if msr_param not in BobHding.POSS_MSR_PARAMS :
                     raise BobException('BobHding.make_bob_hding: unknown msr_param {}'.format(msr_param)) ##
             except StopIteration :
-                return BobHding(roi_set=roi_set, channel_name=channel_name)
+                return BobHding(roi_set=roi_set, channel_def=channel_def, channel_name=channel_name)
 
 
         try :
@@ -94,15 +94,15 @@ class BobHding (object) :
         except StopIteration :
             func = None
 
-        return BobHding(roi_set=roi_set, msr_param=msr_param, channel_name=channel_name, func=func)
+        return BobHding(roi_set=roi_set, msr_param=msr_param, channel_def=channel_def, channel_name=channel_name, func=func)
 
 
-    def __init__(self, msr_param=None, roi_set=None, channel_name=None, func=None) :
+    def __init__(self, msr_param=None, roi_set=None, channel_def=None, channel_name=None, func=None, ) :
 
 
         self.set_msr_param(msr_param)
         self.roi_set = roi_set
-        # self.channel_def = channel_def
+        self.channel_def = channel_def
         self.channel_name = channel_name
 
         self.func = func
@@ -127,6 +127,8 @@ class BobHding (object) :
         return old_col_hding
 
 
+    def is_geo(self) :
+        return self.channel_def == None
 
     def is_cell_sheet(self) :
         if self.roi_set == "Cell" :
@@ -159,7 +161,7 @@ class BobHding (object) :
         return self.__str__()
 
     def __hash__(self) :
-        hash_str = '{},{},{},{}'.format(self.msr_param, self.roi_set, self.channel_name, self.func)
+        hash_str = '{},{},{},{},{}'.format(self.msr_param, self.roi_set, self.channel_def, self.channel_name, self.func)
         return hash(hash_str)
 
     def __eq__(self, other) :

@@ -170,7 +170,7 @@ class Cell :
     def get_nuc_data_col(self, hding) :
         if hding not in self.nuc_data_hdings() :
 
-            raise BobException('cell.get_nuc_data_col: hding {} not in nuc_data_hdings'.format(hding))
+            raise br.LazyEvalException('Cell.get_nuc_data_col', 'cell.get_nuc_data_col: hding {} not in nuc_data_hdings'.format(hding))
 
         ind = self.nuc_data_hdings().index(hding)
 
