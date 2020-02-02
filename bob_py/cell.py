@@ -119,6 +119,7 @@ class Cell :
 
 
         if len(new_data) != self.get_nuc_cnt() :
+
             raise BobException('cell.add_to_nuc_data: nuc_cnt does not match number of rows')
 
         self.nuc_data_hdings().extend(hdings)
@@ -130,6 +131,10 @@ class Cell :
 
             new_row = new_data[nuc_label]
             if len(new_row) != col_cnt :
+                br.dprint(new_row, 'new_row')
+                br.dprint(col_cnt, 'col_cnt')
+                br.dprint(hdings, 'hdings')
+                br.dprint(self.nuc_data_hdings(), 'nuc_data_hdings')
                 raise BobException('cell.add_to_nuc_data: length of hdings does not equal length of row')
 
             self.nuc_data()[nuc_label].extend(new_row)
@@ -149,7 +154,14 @@ class Cell :
 
         norm_col = {}
         for nuc_label, val in col.items() :
-            norm_col[nuc_label] = [val/avg]
+            if avg == 0 :
+                # norm_col[nuc_label] = ['avg==0']
+                norm_col[nuc_label] = ['{}/{}'.format(val, avg)]
+                ## not a good solution
+                # norm_col[nuc_label] = [None]
+
+            else :
+                norm_col[nuc_label] = [val/avg]
 
 
         avg_hding = copy.copy(hding)

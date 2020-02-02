@@ -27,7 +27,7 @@ abbr.
 import os
 import json
 from runpy import run_path
-from datetime import date
+from datetime import date, datetime
 
 from ij import IJ, WindowManager
 from ij.measure import ResultsTable
@@ -42,7 +42,7 @@ import brutils as br
 from .hseg import Hseg
 from .bob_exceptions import BobException, HsegDeactivated
 from .bob_hding import BobHding, BobChannelDef
-from .default_output_hdings import default_cell_output_hdings, default_nuc_output_hdings
+# from .default_output_hdings import default_cell_output_hdings, default_nuc_output_hdings
 
 
 class Exper :
@@ -56,6 +56,11 @@ class Exper :
     CATCH = False
 
 
+    OUTPUT_DIR = 'Spreadsheets-BobPy'
+    OUTPUT_CELL_TERM = 'cell'
+    OUTPUT_NUC_TERM = 'nuc'
+    OUTPUT_ALL_TERM = 'all'
+    OUTPUT_CORE_TERM = 'core'
     PRINT_PROGRESS = True
     """print progress"""
 
@@ -283,7 +288,7 @@ class Exper :
 
     def get_meta_data(self, name) :
         if name not in self.meta_data() :
-            raise br.LazyEvalException('did not find {} in meta_data file'.format(name))
+            raise br.LazyEvalException('Exper.get_meta_dat', 'did not find {} in meta_data file'.format(name))
         else :
             return self.meta_data()[name]
 
@@ -443,7 +448,7 @@ class Exper :
 
     def deactivate_hseg(self, hseg_name, message=None) :
 
-        self.log('error occured and hseg {} is no longer being processed'.format(hseg_name))
+        # self.log('error occured and hseg {} is no longer being processed'.format(hseg_name))
         hseg = self.get_hseg_dict()[hseg_name]
         hseg.inactive = True
 
@@ -559,17 +564,46 @@ class Exper :
 
 
         output_folder = br.dated_output_dir(self.path)
+        #
+        # cell_sheet_path = os.path.join(output_folder, '_'.join([self.name, 'cell-sheet.csv']))
+        # nuc_sheet_path = os.path.join(output_folder, '_'.join([self.name, 'Nuc-sheet.csv']))
+        #
+        # br.rows_to_csv(cell_sheet, cell_sheet_path)
+        # br.rows_to_csv(nuc_sheet, nuc_sheet_path)
 
-        cell_sheet_path = os.path.join(output_folder, '_'.join([self.name, 'cell-sheet.csv']))
-        nuc_sheet_path = os.path.join(output_folder, '_'.join([self.name, 'Nuc-sheet.csv']))
 
-        br.rows_to_csv(cell_sheet, cell_sheet_path)
-        br.rows_to_csv(nuc_sheet, nuc_sheet_path)
+        cell_suf = '-'.join([Exper.OUTPUT_CELL_TERM, Exper.OUTPUT_ALL_TERM]) + '.csv'
+        cell_outpath, cell_rel_outpath = self.create_output_path(cell_suf, sub_dir_name=self.output_dir_name())
+
+        br.rows_to_csv(cell_sheet, cell_outpath)
+        self.log('All cell data saved to /{}'.format(cell_rel_outpath))
+
+        nuc_suf = '-'.join([Exper.OUTPUT_NUC_TERM, Exper.OUTPUT_ALL_TERM]) + '.csv'
+        nuc_outpath, nuc_rel_outpath = self.create_output_path(nuc_suf, sub_dir_name=self.output_dir_name())
+
+        br.rows_to_csv(nuc_sheet, nuc_outpath)
+        self.log('All nuc data saved to /{}'.format(nuc_rel_outpath))
+
+
+    @br.lazy_eval_or_except
+    def cell_output_hdings(self) :
+        self._cell_output_hdings = self.get_meta_data('cell_output_hdings')
+
+    @br.lazy_eval_or_except
+    def nuc_output_hdings(self) :
+        self._nuc_output_hdings = self.get_meta_data('nuc_output_hdings')
+
+    @br.lazy_eval_or_except
+    def output_dir_name(self) :
+        self._output_dir_name = Exper.OUTPUT_DIR
+        output_dir_path = os.path.join(self.path, self._output_dir_name)
+        # print(output_dir_path)
+        br.ensure_dir(output_dir_path)
 
 
     def output_cell_cols_def(self) :
 
-        cell_col_hdings = self.make_bob_hdings_list(default_cell_output_hdings)
+        cell_col_hdings = self.make_bob_hdings_list(self.cell_output_hdings())
         self.output_cell_cols(cell_col_hdings)
 
 
@@ -586,13 +620,25 @@ class Exper :
         hdings.extend(cell_col_hdings)
         rows.insert(0, hdings)
 
-        outpath = br.dated_file_path(self.output_path(), '_'.join([self.name, 'cells.csv']))
+        suf = '-'.join([Exper.OUTPUT_CELL_TERM, Exper.OUTPUT_CORE_TERM]) + '.csv'
+        outpath, rel_outpath = self.create_output_path(suf, sub_dir_name=self.output_dir_name())
         br.rows_to_csv(rows, outpath)
-        self.log('cell data saved: {}'.format(outpath))
+        self.log('Core cell data saved to /{}'.format(rel_outpath))
+
+
+    def create_output_path(self, suf, sub_dir_name=None) :
+        rel_path = '_'.join([self.name, datetime.today().strftime('%y-%m-%d'), suf])
+        if sub_dir_name != None :
+            rel_path = os.path.join(sub_dir_name, rel_path)
+
+        file_path = os.path.join(self.path, rel_path)
+
+        return file_path, rel_path
 
 
     def output_nuc_cols_def(self) :
-        nuc_col_hdings = self.make_bob_hdings_list(default_nuc_output_hdings)
+        nuc_col_hdings = self.make_bob_hdings_list(self.nuc_output_hdings())
+
         self.output_nuc_cols(nuc_col_hdings)
 
 
@@ -610,15 +656,21 @@ class Exper :
             for i in range(len(self.nuc_aggr_col_dict()[nuc_col_hding])) :
                 rows[i].append(self.nuc_aggr_col_dict()[nuc_col_hding][i])
 
-        outpath = br.dated_file_path(self.output_path(), '_'.join([self.name, 'nucs.csv']))
+        # outpath = br.dated_file_path(self.output_path(), '_'.join([self.name, 'nucs.csv']))
+
+
 
         hdings = ['Labels']
         hdings.extend(nuc_col_hdings)
         rows.insert(0, hdings)
 
+
+        suf = '-'.join([Exper.OUTPUT_NUC_TERM, Exper.OUTPUT_CORE_TERM]) + '.csv'
+        outpath, rel_outpath = self.create_output_path(suf, sub_dir_name=self.output_dir_name())
+
         br.rows_to_csv(rows, outpath)
 
-        self.log('nuc data saved: {}'.format(outpath))
+        self.log('Core nuc data saved to /{}'.format(rel_outpath))
 
 
     def make_bob_hdings_list(self,input_hdings) :

@@ -20,7 +20,8 @@ from net.miginfocom.swing import MigLayout
 
 
 import bob_py
-from bob_py.default_meta_data_text import default_meta_data
+# from bob_py.default_meta_data_text import default_meta_data
+from bob_py.make_meta_data_str import make_meta_data_str
 import brutils as br
 
 
@@ -65,12 +66,15 @@ class BobPyTreeCellRenderer(DefaultTreeCellRenderer) :
 
         level = node.getLevel()
 
-        if level == 0 :
-            icon = self.load_icon('exper')
-            self.setIcon(icon)
-        elif level == 1 :
-            icon = self.load_icon('hseg')
-            self.setIcon(icon)
+        try :
+            if level == 0 :
+                icon = self.load_icon('exper')
+                self.setIcon(icon)
+            elif level == 1 :
+                icon = self.load_icon('hseg')
+                self.setIcon(icon)
+        except :
+            pass
 
         return self
 
@@ -81,15 +85,15 @@ class BobPyTreeCellRenderer(DefaultTreeCellRenderer) :
 
 
     def create_icon(self, path) :
-        try :
+        # try :
             # im = ImageIO.read(File(path))
             # im_url = self.getClass().getResource(path)
             # im = ImageIO.read(im_url)
-            ins = self.getClass().getResourceAsStream(path)
+        ins = self.getClass().getResourceAsStream(path)
             # reader = BufferedReader(InputStreamReader(is))
-            im = ImageIO.read(ins)
-        except :
-            raise
+        im = ImageIO.read(ins)
+        # except :
+            # raise
 
         im = im.getScaledInstance(32,32, Image.SCALE_SMOOTH)
         icon = ImageIcon(im)
@@ -132,7 +136,7 @@ class BobGui(JFrame) :
 
         self.add(self.main_panel, BorderLayout.CENTER)
 
-        self.setPreferredSize(Dimension(500,500))
+        self.setPreferredSize(Dimension(650,600))
 
         self.pack()
         self.setLocationRelativeTo(None)
@@ -159,6 +163,8 @@ class BobGui(JFrame) :
 
         # self.log_text = JTextArea()
         self.main_panel.add(self.log_text, 'grow, wrap')
+        self.log_text.setLineWrap(True);
+        self.log_text.setWrapStyleWord(True);
 
         self.revalidate()
 
@@ -191,10 +197,18 @@ class BobGui(JFrame) :
         chf_panel.add(chf_files_text, 'grow, wrap')
 
 
-        meta_data_file_buttton = JButton('Open/Create meta_data file')
-        meta_data_file_buttton.addActionListener(ActionListenerFactory(self, self.meta_data_al))
+        mdf_create_button = JButton('Create meta_data file from default outline')
+        # mdf_create_button = JButton('<html>Create meta_data file<br>from default outline</html>')
+        mdf_create_button.addActionListener(ActionListenerFactory(self, self.mdf_create_al))
+        mdf_open_button = JButton('Open existing meta_data file')
+        mdf_open_button.addActionListener(ActionListenerFactory(self, self.mdf_open_al))
 
-        chf_panel.add(meta_data_file_buttton)
+        # meta_data_file_buttton = JButton('Open/Create meta_data file')
+        # meta_data_file_buttton.addActionListener(ActionListenerFactory(self, self.meta_data_al))
+
+        # chf_panel.add(meta_data_file_buttton)
+        chf_panel.add(mdf_create_button, 'wrap')
+        chf_panel.add(mdf_open_button, 'wrap')
         chf_scroll_pane = JScrollPane()
         chf_scroll_pane.getViewport().setView(chf_panel)
 
@@ -238,9 +252,12 @@ class BobGui(JFrame) :
 
         run_button = JButton('Run')
         run_button.addActionListener(ActionListenerFactory(self, self.run_al))
+        rerun_button = JButton('Rerun')
+        rerun_button.addActionListener(ActionListenerFactory(self, self.rerun_al))
 
 
         hseg_panel.add(run_button)
+        hseg_panel.add(rerun_button)
 
 
         return hseg_panel
@@ -249,41 +266,79 @@ class BobGui(JFrame) :
         self.log_text.append(str(text)+'\n')
 
     def text_field_al(self, e) :
-        self.dir_path = self.dir_text_field.getText()
-        self.got_exper(self.dir_path)
+        # self.dir_path =
+        self.got_exper(self.dir_text_field.getText())
 
 
     def choose_dir_al(self, e) :
 
         dc = DirectoryChooser('Choose a bob_py experiment folder')
-        self.dir_path = dc.getDirectory()
+        # self.dir_path = dc.getDirectory()
 
-        self.dir_text_field.setText(self.dir_path)
+        # self.dir_text_field.setText(self.dir_path)
         # self.dir_text_field.setText('blerg')
         # IJ.log('blerg')
         # print('boop')
-        self.got_exper(self.dir_path)
+        self.got_exper(dc.getDirectory())
 
     def close_al(self, e) :
         self.dispatchEvent(WindowEvent(self, WindowEvent.WINDOW_CLOSING));
 
     def run_al(self, e) :
-        dt = br.dtic('Processed experiment {}'.format(self.exper.name))
+        # dt = br.dtic('Processed experiment {}'.format(self.exper.name))
+        t = br.tic()
         self.exper.make_data()
         self.exper.output_cell_cols_def()
         self.exper.output_nuc_cols_def()
-        br.dtoc(dt)
+        self.exper.output_new_hdings()
 
-    def meta_data_al(self, e) :
+        self.exper.log('Processed experiment {} in {:.3f} seconds'.format(self.exper.name, br.toc(t)))
+        # br.dtoc(dt)
+
+    def rerun_al(self, e) :
+        # dt = br.dtic('Processed experiment {}'.format(self.exper.name))
+        # t = br.tic()
+        self.exper = None
+        self.got_exper(self.dir_path)
+        self.run_al(None)
+        # self.exper =
+        # self.exper.make_data()
+        # self.exper.output_cell_cols_def()
+        # self.exper.output_nuc_cols_def()
+        # self.exper.output_new_hdings()
+        #
+        # self.exper.log('Created and processed experiment {} in {:.3f} seconds'.format(self.exper.name, br.toc(t)))
+        # br.dtoc(dt)
+
+    # def meta_data_al(self, e) :
+    #     meta_data_path = self.exper.meta_data_path()
+    #     if not os.path.exists(meta_data_path) :
+    #         txt = make_meta_data_str(self.exper)
+    #         with open(meta_data_path, 'w') as f :
+    #             f.write(txt)
+    #
+    #     IJ.open(meta_data_path)
+
+
+    def mdf_create_al(self, e) :
         meta_data_path = self.exper.meta_data_path()
-        if not os.path.exists(meta_data_path) :
-            with open(meta_data_path, 'w') as f :
-                f.write(default_meta_data)
+        # if not os.path.exists(meta_data_path) :
+        txt = make_meta_data_str(self.exper)
+        with open(meta_data_path, 'w') as f :
+            f.write(txt)
+
+        # IJ.open(meta_data_path)
+
+    def mdf_open_al(self, e) :
+        meta_data_path = self.exper.meta_data_path()
 
         IJ.open(meta_data_path)
 
     def got_exper(self, dir_path) :
         # IJ.log('exper')
+        self.dir_path = dir_path
+        self.dir_text_field.setText(self.dir_path)
+
         self.log_text = JTextArea()
 
         self.exper = bob_py.Exper(dir_path, gui=self)

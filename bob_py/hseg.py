@@ -109,7 +109,7 @@ class Hseg :
                 # print('create')
                 self._intens_ims[intens_im_name] = self.create_intens_im(info_tup)
         except br.LazyEvalException :
-            print('caught')
+            # print('caught')
             pass
     # def raw_stack(self) :
     #     if not self.has_raw_stack :
@@ -250,7 +250,7 @@ class Hseg :
         """open imp which starts with <hseg.get_id()>_<suf>"""
         if suf not in self.file_path_dict() :
             imp = None
-            IJ.log('hemisegment {} does not have raw tif file {}'.format(self.name, self.name + suf))
+            self.exper.log('hemisegment {} does not have raw tif file {}'.format(self.name, self.name + suf))
             ## raise Exception('hemisegment {} does not have raw tif file {}'.format(self.name, self.name + suf))
 
         else :
@@ -358,7 +358,7 @@ class Hseg :
                     break
 
             if not found_cell :
-                IJ.log('Nuc not in any cell for hemisegment {}'.format(self.name))
+                self.exper.log('Nuc not in any cell for hemisegment {}'.format(self.name))
                 problem_nucs.append(roi)
         return problem_nucs
 
