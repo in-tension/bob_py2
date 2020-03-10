@@ -12,7 +12,7 @@ from java.awt.event import KeyEvent, InputEvent, KeyAdapter, MouseWheelListener,
 from java.awt import Color, Rectangle, GridBagLayout, GridBagConstraints as GBC, Dimension, BorderLayout, GridLayout, Toolkit, Component, RenderingHints, Image
 from java.awt.image import BufferedImage
 
-from javax.swing import JFrame, JPanel, JLabel, JTextField, JButton, BorderFactory, JOptionPane, AbstractAction, JTree, JScrollPane, BoxLayout, JTextArea, JSplitPane, JComponent, KeyStroke, ImageIcon
+from javax.swing import JFrame, JPanel, JLabel, JTextField, JButton, BorderFactory, JOptionPane, AbstractAction, JTree, JScrollPane, BoxLayout, JTextArea, JSplitPane, JComponent, KeyStroke, ImageIcon, JCheckBox
 from javax.swing.tree import DefaultMutableTreeNode, DefaultTreeCellRenderer
 from javax.imageio import ImageIO
 
@@ -21,7 +21,7 @@ from net.miginfocom.swing import MigLayout
 
 import bob_py
 # from bob_py.default_meta_data_text import default_meta_data
-from bob_py.make_meta_data_str import make_meta_data_str
+from bob_py.make_meta_data_str import make_meta_data_str, make_meta_data_str2
 import brutils as br
 
 
@@ -191,10 +191,23 @@ class BobGui(JFrame) :
 
 
         chf_files_label = JLabel('Intensity Image Files')
-        chf_files_text = JTextArea(BobGui.archetype_to_str(self.exper.hseg_intens_im_files_cab().archetype))
+        # chf_files_text = JTextArea(BobGui.archetype_to_str(self.exper.hseg_intens_im_files_cab().archetype))
+        # print(self.exper.hseg_intens_im_files_cab().archetype)
+
+        # chf_panel.add(chf_files_label, 'growx, wrap')
+        # chf_panel.add(chf_files_text, 'grow, wrap')
+
+
+        self.intens_im_boxes = []
+        intens_im_panel = JPanel()
+        intens_im_panel.setLayout(MigLayout('insets 0'))
+        for poss_im_file in self.exper.hseg_intens_im_files_cab().archetype:
+            self.intens_im_boxes.append(JCheckBox(poss_im_file))
+            intens_im_panel.add(self.intens_im_boxes[-1], 'wrap')
+
 
         chf_panel.add(chf_files_label, 'growx, wrap')
-        chf_panel.add(chf_files_text, 'grow, wrap')
+        chf_panel.add(intens_im_panel, 'grow, wrap')
 
 
         mdf_create_button = JButton('Create meta_data file from default outline')
@@ -323,7 +336,11 @@ class BobGui(JFrame) :
     def mdf_create_al(self, e) :
         meta_data_path = self.exper.meta_data_path()
         # if not os.path.exists(meta_data_path) :
-        txt = make_meta_data_str(self.exper)
+        intens_im_list = []
+        for check_box in self.intens_im_boxes:
+            if check_box.isSelected():
+                intens_im_list.append(check_box.getLabel())
+        txt = make_meta_data_str2(self.exper, intens_im_list)
         with open(meta_data_path, 'w') as f :
             f.write(txt)
 
