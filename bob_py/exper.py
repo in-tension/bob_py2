@@ -112,10 +112,9 @@ class Exper :
 
     def __init__(self, path, gui=None) :
         """
-        Args:
-            msg (str): Human readable string describing the exception.
-            code (:obj:`int`, optional): Error code.
+
         """
+        Exper.setup()
 
         if path.endswith(os.sep) :
             path = path[:-1]
@@ -482,7 +481,8 @@ class Exper :
 
             except Exception as e :
                 self.log(br.exception_str(e))
-                raise
+                self.log(hseg.name)
+                # raise
 
     # } </processing>
 

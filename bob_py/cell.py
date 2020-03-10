@@ -217,6 +217,10 @@ class Cell :
         nuc_bin_copy.setRoi(self.roi())
         IJ.run(nuc_bin_copy, "Clear Outside", "")
 
+        # 1/0
+
+
+
         IJ.run(nuc_bin_copy, "Voronoi", "")
         nuc_bin_copy.setRoi(None)
         ip = nuc_bin_copy.getProcessor()
@@ -227,7 +231,18 @@ class Cell :
         IJ.run(nuc_bin_copy, "Analyze Particles...", "add")
         vor_rois = rm.getRoisAsArray()
 
+        # self.hseg.raw_stack().show()
+        # 10/0
+
+
+
+
         futils.force_close(nuc_bin_copy)
+
+
+
+
+
 
         return vor_rois
 
@@ -260,7 +275,7 @@ class Cell :
 
             else :
 
-                raise BobException('issue matching voronoi and nuc')
+                raise BobException('{}: issue matching voronoi and nuc'.format(self.hseg.name))
 
             if temp is not None :
                 del nuc_inds[temp]
