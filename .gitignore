@@ -1,2 +1,5 @@
 *.class
 
+build/bob_py
+build/fiji_utils
+build/brutils
