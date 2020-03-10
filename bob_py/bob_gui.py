@@ -190,7 +190,7 @@ class BobGui(JFrame) :
         chf_panel.add(chf_files_text, 'grow, wrap')
 
 
-        chf_files_label = JLabel('Intensity Image Files')
+        chf_files_label = JLabel('Possible Intensity Image Files')
         chf_files_text = JTextArea(BobGui.archetype_to_str(self.exper.hseg_intens_im_files_cab().archetype))
 
         chf_panel.add(chf_files_label, 'growx, wrap')

@@ -12,7 +12,6 @@ abbr.
 ## TODO : NND
 ## TODO : rel_y
 ## TODO :
-## TODO :
 
 
 ## COULDDO: nuc_bin
@@ -21,7 +20,6 @@ abbr.
 
 ## also make an iterator for exper to iterate throught the hseg
 ## where in the __next__ function it checks to see if macro has been cancelled
-
 
 
 import os
@@ -65,7 +63,6 @@ class Exper :
     """print progress"""
 
 
-
     META_SUF = '.py'
     """suffix of the meta data file
     prefix should be the Exper.name"""
@@ -97,14 +94,13 @@ class Exper :
             rm.show()
 
 
-    def user_init(self, path) :
-        exper = Exper(path)
-
-        meta_path = exper.meta_data_path()
-
-        if not os.path.exists(meta_path) :
-            pass
-
+    # def user_init(self, path) :
+    #     exper = Exper(path)
+    #
+    #     meta_path = exper.meta_data_path()
+    #
+    #     if not os.path.exists(meta_path) :
+    #         pass
 
 
     # } </static_and_class_methods>
@@ -130,7 +126,6 @@ class Exper :
 
         self.gui = gui
         self.log('Experiment {} initialized'.format(self.name))
-
 
 
 
@@ -480,9 +475,16 @@ class Exper :
                 self.log(hd)
 
             except Exception as e :
-                self.log(br.exception_str(e))
-                self.log(hseg.name)
+                # self.log(br.exception_str(e))
+                # self.log(hseg.name)
                 # raise
+                # hd = HsegDeactivated(br.exception_str(e))
+                # self.log(hd)
+                try:
+                    self.deactivate_hseg(hseg.name, br.exception_str(e))
+                # catch:
+                except HsegDeactivated as hd:
+                    self.log(hd)
 
     # } </processing>
 
