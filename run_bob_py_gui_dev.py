@@ -32,8 +32,8 @@ from ij.plugin.frame import RoiManager
 
 #from .bob_py_gui import BobGui
 
-exper_path = "/Users/baylieslab/Documents/Amelia/data/steffiData/150511_Lim3b-GFP_Hoe-GFP-H4K16ac-Fib-DL-Phal"
-
+#exper_path = "/Users/baylieslab/Documents/Amelia/data/steffiData/150511_Lim3b-GFP_Hoe-GFP-H4K16ac-Fib-DL-Phal"
+exper_path = "/Users/baylieslab/Desktop/200130_w1118-18C"
 #t = br.tic()
 
 #bob_py.Exper.setup()
